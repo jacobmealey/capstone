@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name "ece_capstone")(type "KiCad")(uri "${KIPRJMOD}/../ece_capstone_midi_extras.kicad_sym")(options "")(descr ""))
+)
