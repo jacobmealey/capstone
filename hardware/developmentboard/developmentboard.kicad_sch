@@ -219,7 +219,7 @@
   (symbol (lib_id "ece_capstone:ADS7960") (at 132.08 54.61 0) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid eedfbb34-1201-4310-b013-358cf3bc5368)
-    (property "Reference" "U?" (id 0) (at 132.8294 40.64 0)
+    (property "Reference" "U1" (id 0) (at 132.8294 40.64 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "ADS7960" (id 1) (at 132.8294 43.18 0)
@@ -274,7 +274,7 @@
   (symbol (lib_name "DRV5053_1") (lib_id "ece_capstone:DRV5053") (at 173.99 49.53 0) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid f988279f-4c4d-4b25-b4fc-c7518a23f719)
-    (property "Reference" "U?" (id 0) (at 172.085 45.72 0))
+    (property "Reference" "U2" (id 0) (at 172.085 45.72 0))
     (property "Value" "DRV5053" (id 1) (at 172.085 48.26 0))
     (property "Footprint" "Package_TO_SOT_SMD:SOT-23" (id 2) (at 173.99 49.53 0)
       (effects (font (size 1.27 1.27)) hide)
@@ -293,10 +293,10 @@
 
   (symbol_instances
     (path "/eedfbb34-1201-4310-b013-358cf3bc5368"
-      (reference "U?") (unit 1) (value "ADS7960") (footprint "Package_SO:TSSOP-38_4.4x9.7mm_P0.5mm")
+      (reference "U1") (unit 1) (value "ADS7960") (footprint "Package_SO:TSSOP-38_4.4x9.7mm_P0.5mm")
     )
     (path "/f988279f-4c4d-4b25-b4fc-c7518a23f719"
-      (reference "U?") (unit 1) (value "DRV5053") (footprint "Package_TO_SOT_SMD:SOT-23")
+      (reference "U2") (unit 1) (value "DRV5053") (footprint "Package_TO_SOT_SMD:SOT-23")
     )
   )
 )
