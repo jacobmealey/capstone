@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name "ece_capstone")(type "KiCad")(uri "${KIPRJMOD}/../ece_capstone_midi_extras.kicad_sym")(options "")(descr ""))
+  (lib (name "MCU_RaspberryPi_RP2040")(type "KiCad")(uri "/home/landyn/Desktop/Capstone/capstone/hardware/MCU_RaspberryPi_RP2040.kicad_sym")(options "")(descr ""))
+)
