@@ -30,3 +30,5 @@ fp-info-cache
 
 # Freecad 
 *.FCStd1
+
+software/firmware/build
