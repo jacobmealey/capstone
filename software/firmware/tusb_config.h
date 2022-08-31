@@ -94,12 +94,8 @@
 #define CFG_TUD_ENDPOINT0_SIZE    64
 #endif
 
-//------------- CLASS -------------//
-#define CFG_TUD_CDC               0
-#define CFG_TUD_MSC               0
-#define CFG_TUD_HID               0
+// SET as MIDI device
 #define CFG_TUD_MIDI              1
-#define CFG_TUD_VENDOR            0
 
 // MIDI FIFO size of TX and RX
 #define CFG_TUD_MIDI_RX_BUFSIZE   (TUD_OPT_HIGH_SPEED ? 512 : 64)

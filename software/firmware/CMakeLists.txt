@@ -8,6 +8,7 @@ include_directories($ENV{PICO_SDK_PATH}/tinyusb/src)
 add_executable(midi_firmware
         main.c
         usb_descriptors.c
+        adc.c
     )
 
 project(midi_firmware C CXX ASM)
@@ -27,7 +28,7 @@ pico_add_extra_outputs(midi_firmware)
 
 target_include_directories(midi_firmware PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
-target_link_libraries(midi_firmware PUBLIC pico_stdlib tinyusb_device tinyusb_board)
+target_link_libraries(midi_firmware PUBLIC pico_stdlib tinyusb_device tinyusb_board hardware_spi)
 
 # create map/bin/hex file etc.
 pico_add_extra_outputs(midi_firmware)
