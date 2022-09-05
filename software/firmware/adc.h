@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include "pico/binary_info.h"
 #include "hardware/spi.h"
+#include "hardware/gpio.h"
 
 // ADC Modes
 #define ADC_MODE_RESET 0x0001
@@ -31,8 +32,10 @@ struct adc_t {
     uint16_t control_reg;
     uint16_t prev_chanel;
     uint16_t channel_val;
+    uint16_t spi_cs;
 };
 
-int init_adc(struct adc_t* adc);
+int init_adc(struct adc_t* adc, spi_inst_t *spi, uint16_t spi_cs);
+int adc_write_read_blocking(struct adc_t *adc);
 
 #endif

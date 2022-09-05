@@ -24,13 +24,17 @@
  */
 
 #include <stdlib.h>
-#include <stdio.h>
+//#include <stdio.h>
 #include <string.h>
 
 #include "bsp/board.h"
 #include "tusb.h"
 
 #include "adc.h"
+
+#include "hardware/spi.h"
+#include "hardware/gpio.h"
+#include "pico/stdio.h"
 
 /* This MIDI example send sequence of note (on/off) repeatedly. To test on PC, you need to install
  * synth software and midi connection management software. On
@@ -57,20 +61,48 @@ enum  {
 static uint32_t blink_interval_ms = BLINK_NOT_MOUNTED;
 
 void led_blinking_task(void);
-void midi_task(void);
+void midi_task(struct adc_t *adc);
+
+int vel = 0;
 
 /*------------- MAIN -------------*/
 int main(void) {
-    struct adc_t adc;
-    init_adc(&adc);
-    board_init();
+    unsigned int spi_cs  = 5;
+    unsigned int spi_miso = 4;
+    unsigned int spi_mosi = 3;
+    unsigned int spi_clk  = 2;
+    uint16_t input = 0;
+    uint16_t output = (ADC_MODE_RESET) << 12;
+ 
+    stdio_init_all();
 
-    tusb_init();
+    spi_init(spi0, 100000);
+    spi_set_format(spi0, 16, 1, 1, SPI_MSB_FIRST);
+    gpio_set_function(spi_clk, GPIO_FUNC_SPI);
+    gpio_set_function(spi_miso, GPIO_FUNC_SPI);
+    gpio_set_function(spi_mosi, GPIO_FUNC_SPI);
+
+    struct adc_t adc;
+    gpio_init(spi_cs);
+    gpio_set_dir(spi_cs, GPIO_OUT);
+    gpio_put(spi_cs, 1);
+    init_adc(&adc, spi0, spi_cs);
+    adc_write_read_blocking(&adc);
+
+   tusb_init();
 
     while (1) {
+        //gpio_put(spi_cs, 0);
+        //spi_write16_blocking(spi0, &output, 1);
+        //gpio_put(spi_cs, 1);
+        //sleep_ms(10);
+
+        //gpio_put(spi_cs, 0);
+        //spi_read16_blocking(spi0, output, &input, 1);
+        //gpio_put(spi_cs, 1);
         tud_task(); // tinyusb device task
         led_blinking_task();
-        midi_task();
+        midi_task(&adc);
     }
 
 
@@ -118,11 +150,15 @@ uint8_t note_sequence[] = {
     56,61,64,68,74,78,81,86,90,93,98,102
 };
 
-void midi_task(void) {
+void midi_task(struct adc_t *adc) {
     static uint32_t start_ms = 0;
 
     uint8_t const cable_num = 0; // MIDI jack associated with USB endpoint
     uint8_t const channel   = 0; // 0 for channel 1
+    // GET most recently read key 
+    if(adc == NULL) return;
+    adc_write_read_blocking(adc);
+
 
     // The MIDI interface always creates input and output port/jack descriptors
     // regardless of these being used or not. Therefore incoming traffic should be read
@@ -141,8 +177,8 @@ void midi_task(void) {
     // previous position to the last note in the sequence.
     if (previous < 0) previous = sizeof(note_sequence) - 1;
 
-    // Send Note On for current position at full velocity (127) on channel 1.
-    uint8_t note_on[3] = { 0x90 | channel, note_sequence[note_pos], 127 };
+    // Send note and the velocity equal to the value of the key position we JUST pressed 
+    uint8_t note_on[3] = { 0x90 | channel, note_sequence[note_pos], (adc->channel_val >> 4) & 0xFF};
     tud_midi_stream_write(cable_num, note_on, 3);
 
     // Send Note Off for previous note.
