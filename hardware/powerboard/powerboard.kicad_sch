@@ -2573,7 +2573,7 @@
     (uuid 985ac95d-4079-4633-83a9-2b6fdcd0332b)
     (property "Reference" "L1" (id 0) (at 81.28 55.88 90))
     (property "Value" "4.7uH" (id 1) (at 81.28 58.42 90))
-    (property "Footprint" "" (id 2) (at 81.28 62.23 0)
+    (property "Footprint" "Inductor_SMD:L_1812_4532Metric" (id 2) (at 81.28 62.23 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (id 3) (at 81.28 62.23 0)
@@ -2994,7 +2994,7 @@
     (property "Value" "ABLS-12.000MHZ-B4-T" (id 1) (at 62.23 156.21 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
-    (property "Footprint" "Crystal:Crystal_HC49-4H_Vertical" (id 2) (at 72.39 165.1 0)
+    (property "Footprint" "RP2040_minimal:Crystal_SMD_HC49-US" (id 2) (at 72.39 165.1 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (id 3) (at 72.39 165.1 0)
@@ -3325,7 +3325,7 @@
       (reference "J4") (unit 1) (value "SPI Header") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical")
     )
     (path "/985ac95d-4079-4633-83a9-2b6fdcd0332b"
-      (reference "L1") (unit 1) (value "4.7uH") (footprint "")
+      (reference "L1") (unit 1) (value "4.7uH") (footprint "Inductor_SMD:L_1812_4532Metric")
     )
     (path "/2035ea6c-6ade-4ffb-9114-438bd049019e"
       (reference "R1") (unit 1) (value "R") (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -3379,7 +3379,7 @@
       (reference "U4") (unit 1) (value "W25Q128JVSIM") (footprint "Package_SO:SOIC-8_7.5x5.85mm_P1.27mm")
     )
     (path "/e2e2bf3f-d1e0-4862-acaf-b79cbebcb3a1"
-      (reference "Y1") (unit 1) (value "ABLS-12.000MHZ-B4-T") (footprint "Crystal:Crystal_HC49-4H_Vertical")
+      (reference "Y1") (unit 1) (value "ABLS-12.000MHZ-B4-T") (footprint "RP2040_minimal:Crystal_SMD_HC49-US")
     )
   )
 )
