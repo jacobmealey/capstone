@@ -37,7 +37,9 @@ struct adc_t {
     uint16_t spi_cs;
 };
 
-int init_adc(struct adc_t* adc, spi_inst_t *spi, uint16_t spi_cs);
+extern struct adc_t *adc_global;
+
+struct adc_t *init_adc(spi_inst_t *spi, uint16_t spi_cs);
 int adc_write_read_blocking(struct adc_t *adc);
 bool adc_write_callback(repeating_timer_t *t);
 void adc_read_irq(void);

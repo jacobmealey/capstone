@@ -64,6 +64,7 @@ void led_blinking_task(void);
 void midi_task(struct adc_t *adc);
 
 int vel = 0;
+struct adc_t *adc_global;
 
 /*------------- MAIN -------------*/
 int main(void) {
@@ -85,16 +86,15 @@ int main(void) {
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
 
 
-    struct adc_t adc;
-    init_adc(&adc, spi0, spi_cs);
+    adc_global = init_adc(spi0, spi_cs);
 
     int state = 1;
-   //tusb_init();
+    tusb_init();
 
    while (1) {
-        //tud_task(); // tinyusb device task
-        //led_blinking_task();
-        //midi_task(&adc);
+        tud_task(); // tinyusb device task
+        led_blinking_task();
+        midi_task(adc_global);
     }
 
 
@@ -149,7 +149,6 @@ void midi_task(struct adc_t *adc) {
     uint8_t const channel   = 0; // 0 for channel 1
     // GET most recently read key 
     if(adc == NULL) return;
-    adc_write_read_blocking(adc);
 
 
     // The MIDI interface always creates input and output port/jack descriptors
@@ -170,7 +169,7 @@ void midi_task(struct adc_t *adc) {
     if (previous < 0) previous = sizeof(note_sequence) - 1;
 
     // Send note and the velocity equal to the value of the key position we JUST pressed 
-    uint8_t note_on[3] = { 0x90 | channel, note_sequence[note_pos], (adc->channel_val >> 4) & 0xFF};
+    uint8_t note_on[3] = { 0x90 | channel, note_sequence[note_pos], adc->channel_val};
     tud_midi_stream_write(cable_num, note_on, 3);
 
     // Send Note Off for previous note.

@@ -1,12 +1,14 @@
 #include "adc.h"
 
-int init_adc(struct adc_t* adc, spi_inst_t *spi, uint16_t spi_cs) {
+struct adc_t *init_adc(spi_inst_t *spi, uint16_t spi_cs) {
     // The adc will work in auto-mode 2 which is defined as auto
     // incrementing the channel from channel zero to the channel 
     // programmed in during the programming process.
-    if(adc == NULL || spi == NULL) {
-        return 1;
+    if(spi == NULL) {
+        return NULL;
     }
+
+    struct adc_t *adc = malloc(sizeof(struct adc_t));
 
     spi_init(spi0, 100000);
     spi_set_format(spi, 16, 1, 1, SPI_MSB_FIRST);
@@ -34,7 +36,7 @@ int init_adc(struct adc_t* adc, spi_inst_t *spi, uint16_t spi_cs) {
     irq_add_shared_handler(SPI0_IRQ, adc_read_irq, 1);
     irq_set_enabled(SPI0_IRQ, true);
 
-    return 0;
+    return adc;
 }
 
 bool adc_write_callback(struct repeating_timer *t) {
@@ -45,6 +47,7 @@ bool adc_write_callback(struct repeating_timer *t) {
 
 void adc_read_irq(void) {
     gpio_put(PICO_DEFAULT_LED_PIN, 0);
+    adc_global->channel_val = (spi_get_hw(spi0)->dr & 0xFF)> 127 ? 127 : (spi_get_hw(spi0)->dr & 0xFF);
     spi_get_hw(spi0)->icr = 0;
 }
 
