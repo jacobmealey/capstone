@@ -33,7 +33,7 @@ target_link_libraries(midi_firmware PUBLIC
       tinyusb_device 
       tinyusb_board 
       hardware_spi 
-      hardware_dma)
+      hardware_irq)
 
 # create map/bin/hex file etc.
 pico_add_extra_outputs(midi_firmware)

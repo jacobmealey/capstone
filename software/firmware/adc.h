@@ -7,7 +7,7 @@
 #include "pico/stdlib.h"
 #include "hardware/spi.h"
 #include "hardware/gpio.h"
-#include "hardware/dma.h"
+#include "hardware/irq.h"
 
 // ADC Modes
 #define ADC_MODE_RESET 0x0001
@@ -40,5 +40,6 @@ struct adc_t {
 int init_adc(struct adc_t* adc, spi_inst_t *spi, uint16_t spi_cs);
 int adc_write_read_blocking(struct adc_t *adc);
 bool adc_write_callback(repeating_timer_t *t);
+void adc_read_irq(void);
 
 #endif
