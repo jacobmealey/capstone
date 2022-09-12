@@ -28,7 +28,12 @@ pico_add_extra_outputs(midi_firmware)
 
 target_include_directories(midi_firmware PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
-target_link_libraries(midi_firmware PUBLIC pico_stdlib tinyusb_device tinyusb_board hardware_spi)
+target_link_libraries(midi_firmware PUBLIC 
+      pico_stdlib 
+      tinyusb_device 
+      tinyusb_board 
+      hardware_spi 
+      hardware_irq)
 
 # create map/bin/hex file etc.
 pico_add_extra_outputs(midi_firmware)
