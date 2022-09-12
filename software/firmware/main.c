@@ -76,33 +76,25 @@ int main(void) {
  
     stdio_init_all();
 
-    spi_init(spi0, 100000);
-    spi_set_format(spi0, 16, 1, 1, SPI_MSB_FIRST);
     gpio_set_function(spi_clk, GPIO_FUNC_SPI);
     gpio_set_function(spi_miso, GPIO_FUNC_SPI);
     gpio_set_function(spi_mosi, GPIO_FUNC_SPI);
+    gpio_set_function(spi_cs, GPIO_FUNC_SPI);
+
+    gpio_init(PICO_DEFAULT_LED_PIN);
+    gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
+
 
     struct adc_t adc;
-    gpio_init(spi_cs);
-    gpio_set_dir(spi_cs, GPIO_OUT);
-    gpio_put(spi_cs, 1);
     init_adc(&adc, spi0, spi_cs);
-    adc_write_read_blocking(&adc);
 
-   tusb_init();
+    int state = 1;
+   //tusb_init();
 
-    while (1) {
-        //gpio_put(spi_cs, 0);
-        //spi_write16_blocking(spi0, &output, 1);
-        //gpio_put(spi_cs, 1);
-        //sleep_ms(10);
-
-        //gpio_put(spi_cs, 0);
-        //spi_read16_blocking(spi0, output, &input, 1);
-        //gpio_put(spi_cs, 1);
-        tud_task(); // tinyusb device task
-        led_blinking_task();
-        midi_task(&adc);
+   while (1) {
+        //tud_task(); // tinyusb device task
+        //led_blinking_task();
+        //midi_task(&adc);
     }
 
 
