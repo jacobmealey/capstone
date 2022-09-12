@@ -14,13 +14,13 @@ int init_adc(struct adc_t* adc, spi_inst_t *spi, uint16_t spi_cs) {
     adc->spi_cs = spi_cs;
     adc->control_reg = 0x1000;  
     // writes adc->control_reg to spi bus and reads into channel values
-    adc_write_read_blocking(adc);
-    // We are entering auto-2 programming. 0x9 is the code for enter auto 
-    // programming and we want to have '12' in bits 9 - 6
-    adc->control_reg = 0x9000 | (12u << 6);
-    adc_write_read_blocking(adc);
-    // set control register to continue in auto mode-2
-    adc->control_reg = 0x3000; 
+    //adc_write_read_blocking(adc);
+    //// We are entering auto-2 programming. 0x9 is the code for enter auto 
+    //// programming and we want to have '12' in bits 9 - 6
+    //adc->control_reg = 0x9000 | (12u << 6);
+    //adc_write_read_blocking(adc);
+    //// set control register to continue in auto mode-2
+    //adc->control_reg = 0x3000; 
 
     // Configure timer for SPI writes
     // timer must be allocated in heap so it lives beyond lifetime of init_adc
@@ -39,7 +39,7 @@ int init_adc(struct adc_t* adc, spi_inst_t *spi, uint16_t spi_cs) {
 
 bool adc_write_callback(struct repeating_timer *t) {
         gpio_put(PICO_DEFAULT_LED_PIN, 1);
-        spi_get_hw(spi0)->dr = 0x3000;
+        spi_get_hw(spi0)->dr = 0x1000;
         return true;
 }
 
