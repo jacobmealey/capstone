@@ -68,6 +68,8 @@ struct adc_t *adc_global;
 
 /*------------- MAIN -------------*/
 int main(void) {
+    unsigned int uart_tx = 16;
+    unsigned int uart_rx = 17;
     unsigned int spi_cs  = 5;
     unsigned int spi_miso = 4;
     unsigned int spi_mosi = 3;
@@ -76,12 +78,20 @@ int main(void) {
     uint16_t output = (ADC_MODE_RESET) << 12;
  
     stdio_init_all();
+    uart_init(uart0, 9600);
+    
+    // UART pin defs
+    gpio_set_function(uart_tx, GPIO_FUNC_UART);
+    gpio_set_function(uart_rx, GPIO_FUNC_UART);
+    printf("Hello, Midi!\n");
 
+    // SPI0 pin defs
     gpio_set_function(spi_clk, GPIO_FUNC_SPI);
     gpio_set_function(spi_miso, GPIO_FUNC_SPI);
     gpio_set_function(spi_mosi, GPIO_FUNC_SPI);
     gpio_set_function(spi_cs, GPIO_FUNC_SPI);
 
+    // LED pin defs
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
 

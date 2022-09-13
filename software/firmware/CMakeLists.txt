@@ -23,7 +23,7 @@ pico_sdk_init()
 
 # usb output
 pico_enable_stdio_usb(midi_firmware 0)
-pico_enable_stdio_uart(midi_firmware 0)
+pico_enable_stdio_uart(midi_firmware 1)
 pico_add_extra_outputs(midi_firmware)
 
 target_include_directories(midi_firmware PUBLIC ${CMAKE_CURRENT_LIST_DIR})

@@ -11,7 +11,8 @@
 
 // ADC Modes
 #define ADC_MODE_RESET 0x0001
-#define ADC_MODE_AUTO1 0x0002
+#define ADC_MODE_AUTO1 (0x0002 << 12) | 1u << 10
+#define ADC_MODE_AUTO2 0x0003 << 12
 
 // ADC Auto Mode 1 Control Flags
 #define M1_FLAG_EN_PROGRAMMING  0x0800
@@ -25,7 +26,10 @@
 #define ADC_PRC_CHAN(d) (d >> 12)
 
 // For entering programming ADC auto mode 1
-#define ADC_PROG_AUTO1 0x8000
+#define ADC_AUTO1_PROG 0x8000 
+#define ADC_AUTO2_PROG 0x9000 | (12u << 6u)
+#define ADC_ALARM_PROG ADC_MODE_RESET << 12
+#define ADC_GPIO_PROG  ADC_MODE_RESET << 12
 // Enabling all channels for the 12 bit ADC
 #define ADC_PROG_ENALL 0x0FFF
 
