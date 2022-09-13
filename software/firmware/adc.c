@@ -11,30 +11,24 @@ struct adc_t *init_adc(spi_inst_t *spi, uint16_t spi_cs) {
 
     struct adc_t *adc = malloc(sizeof(struct adc_t));
 
-    spi_init(spi0, 10000);
+    spi_init(spi0, 100000);
     spi_set_format(spi, 16, 0, 0, SPI_MSB_FIRST);
     adc->spi = spi;
     adc->spi_cs = spi_cs;
     adc->control_reg = 0x1000;  
     // operating in manual mode
-    for (int i = 0; i < 10; i++){
+    for (int i = 0; i < 6; i++){
         adc_write_read_blocking(adc);
         printf("0x%04x 0x%04x\n", adc->control_reg, adc->channel_val);
-        sleep_ms(100);
     }
-    // auto 1 programming register
-    adc->control_reg = 0x8000;
+    // auto 2 programming register
+    // We are entering auto-2 programming. 12 is the amount of channels 
+    // we want to go up to. 
+    adc->control_reg = ADC_AUTO2_PROG(12u);
     adc_write_read_blocking(adc);
     printf("0x%04x 0x%04x\n", adc->control_reg, adc->channel_val);
-    sleep_ms(50);
-    adc->control_reg = 0x0FFF;
-    adc_write_read_blocking(adc);
-    printf("0x%04x 0x%04x\n", adc->control_reg, adc->channel_val);
-    sleep_ms(50);
-    // We are entering auto-2 programming. 0x9 is the code for enter auto 
-    // programming and we want to have '12' in bits 9 - 6
     // set control register to continue in auto mode-2
-    adc->control_reg = 0x2000;
+    adc->control_reg = ADC_MODE_AUTO2;
 
     // Configure timer for SPI writes
     // timer must be allocated in heap so it lives beyond lifetime of init_adc
@@ -44,7 +38,7 @@ struct adc_t *init_adc(spi_inst_t *spi, uint16_t spi_cs) {
     }
 
     // configure interrupt for spi reads
-    spi_get_hw(spi0)->imsc = 1 << 1;
+    spi_get_hw(adc->spi)->imsc = 1 << 1;
     irq_add_shared_handler(SPI0_IRQ, adc_read_irq, 1);
     irq_set_enabled(SPI0_IRQ, true);
 
@@ -53,16 +47,15 @@ struct adc_t *init_adc(spi_inst_t *spi, uint16_t spi_cs) {
 
 bool adc_write_callback(struct repeating_timer *t) {
         gpio_put(PICO_DEFAULT_LED_PIN, 1);
-        spi_get_hw(spi0)->dr = adc_global->control_reg;
+        spi_get_hw(adc_global->spi)->dr = adc_global->control_reg;
         return true;
 }
 
 void adc_read_irq(void) {
     gpio_put(PICO_DEFAULT_LED_PIN, 0);
     printf("0x%04x 0x%04x\n", adc_global->control_reg, adc_global->channel_val);
-    adc_global->channel_val = spi_get_hw(spi0)->dr;
-    adc_global->control_reg = 0x1000 | (((adc_global->channel_val >> 12) + 1) % 12u) << 7;
-    spi_get_hw(spi0)->icr = 0;
+    adc_global->channel_val = spi_get_hw(adc_global->spi)->dr;
+    spi_get_hw(adc_global->spi)->icr = 0;
 }
 
 int adc_write_read_blocking(struct adc_t *adc) {
