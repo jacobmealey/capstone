@@ -15,7 +15,7 @@ struct adc_t *init_adc(spi_inst_t *spi, uint16_t spi_cs) {
     spi_set_format(spi, 16, 0, 0, SPI_MSB_FIRST);
     adc->spi = spi;
     adc->spi_cs = spi_cs;
-    adc->control_reg = 0x1000;  
+    adc->control_reg = ADC_MODE_RESET;  
     // operating in manual mode
     for (int i = 0; i < 6; i++){
         adc_write_read_blocking(adc);

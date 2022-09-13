@@ -27,7 +27,9 @@
 
 // For entering programming ADC auto mode 1
 #define ADC_AUTO1_PROG 0x8000 
-#define ADC_AUTO2_PROG(a) (0x9000 | (a << 6u))
+// ADC_AUTO2_PROG takes one parameter an 8 bit integer to 
+// specify the max channel to read to starting from zero
+#define ADC_AUTO2_PROG(a) (0x9000 | ((a & 0xF) << 6u))
 #define ADC_ALARM_PROG ADC_MODE_RESET << 12
 #define ADC_GPIO_PROG  ADC_MODE_RESET << 12
 // Enabling all channels for the 12 bit ADC
@@ -43,9 +45,20 @@ struct adc_t {
 
 extern struct adc_t *adc_global;
 
+// init adc takes the spi and the CS lines, it allocates 
+// and adc_t on the heap which is returned at the end of 
+// the function. it also allocats a repeating_timer_t 
 struct adc_t *init_adc(spi_inst_t *spi, uint16_t spi_cs);
+
+// thing wrapper around spi_write_read16_blocking
 int adc_write_read_blocking(struct adc_t *adc);
+
+// the callback function whenever the timer allocated in 
+// init elapses. TODO: add someway to overright this? 
+// perhaps using __weak__?
 bool adc_write_callback(repeating_timer_t *t);
+// the function which is called when the SPI bus recieves
+// data from the ADC TODO add somway to overwrite this.
 void adc_read_irq(void);
 
 #endif
