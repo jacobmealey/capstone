@@ -46,6 +46,7 @@ struct adc_t *init_adc(spi_inst_t *spi, uint16_t spi_cs) {
 }
 
 bool adc_write_callback(struct repeating_timer *t) {
+        (void)(t);
         gpio_put(PICO_DEFAULT_LED_PIN, 1);
         spi_get_hw(adc_global->spi)->dr = adc_global->control_reg;
         return true;
@@ -67,4 +68,5 @@ int adc_write_read_blocking(struct adc_t *adc) {
     gpio_put(adc->spi_cs, 0);
     spi_read16_blocking(adc->spi, adc->control_reg, &adc->channel_val, 1);
     gpio_put(adc->spi_cs, 1);
+    return 0;
 }

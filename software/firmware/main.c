@@ -74,8 +74,6 @@ int main(void) {
     unsigned int spi_miso = 4;
     unsigned int spi_mosi = 3;
     unsigned int spi_clk  = 2;
-    uint16_t input = 0;
-    uint16_t output = (ADC_MODE_RESET) << 12;
  
     stdio_init_all();
     uart_init(uart0, 9600);
@@ -98,7 +96,6 @@ int main(void) {
 
     adc_global = init_adc(spi0, spi_cs);
 
-    int state = 1;
     tusb_init();
 
    while (1) {

@@ -5,6 +5,8 @@ include($ENV{PICO_SDK_PATH}/lib/tinyusb/hw/bsp/rp2040/family.cmake)
 
 include_directories($ENV{PICO_SDK_PATH}/tinyusb/src)
 
+add_compile_options(-Wall -Wextra)
+
 add_executable(midi_firmware
         main.c
         usb_descriptors.c
