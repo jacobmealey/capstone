@@ -31,6 +31,7 @@
 #include "tusb.h"
 
 #include "adc.h"
+#include "pins.h"
 
 #include "hardware/spi.h"
 #include "hardware/gpio.h"
@@ -79,15 +80,22 @@ int main(void) {
     uart_init(uart0, 9600);
     
     // UART pin defs
-    gpio_set_function(uart_tx, GPIO_FUNC_UART);
-    gpio_set_function(uart_rx, GPIO_FUNC_UART);
+    gpio_set_function(UART0_TX, GPIO_FUNC_UART);
+    gpio_set_function(UART0_RX, GPIO_FUNC_UART);
     printf("Hello, Midi!\n");
 
-    // SPI0 pin defs
-    gpio_set_function(spi_clk, GPIO_FUNC_SPI);
-    gpio_set_function(spi_miso, GPIO_FUNC_SPI);
-    gpio_set_function(spi_mosi, GPIO_FUNC_SPI);
-    gpio_set_function(spi_cs, GPIO_FUNC_SPI);
+    // SPI1 pin defs (ADC)
+    gpio_set_function(SPI1_SCLK, GPIO_FUNC_SPI);
+    gpio_set_function(SPI1_RX, GPIO_FUNC_SPI);
+    gpio_set_function(SPI1_TX, GPIO_FUNC_SPI);
+    gpio_set_function(SPI1_CS, GPIO_FUNC_SPI);
+
+    // SPI0 pin defs (Display)
+    gpio_set_function(SPI0_SCLK, GPIO_FUNC_SPI);
+    gpio_set_function(SPI0_RX, GPIO_FUNC_SPI);
+    gpio_set_function(SPI0_TX, GPIO_FUNC_SPI);
+    gpio_set_function(SPI0_CS, GPIO_FUNC_SPI);
+
 
     // LED pin defs
     gpio_init(PICO_DEFAULT_LED_PIN);
