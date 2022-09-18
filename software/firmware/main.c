@@ -31,6 +31,8 @@
 #include "tusb.h"
 
 #include "adc.h"
+#include "pins.h"
+#include "midi.h"
 
 #include "hardware/spi.h"
 #include "hardware/gpio.h"
@@ -68,33 +70,34 @@ struct adc_t *adc_global;
 
 /*------------- MAIN -------------*/
 int main(void) {
-    unsigned int uart_tx = 16;
-    unsigned int uart_rx = 17;
-    unsigned int spi_cs  = 5;
-    unsigned int spi_miso = 4;
-    unsigned int spi_mosi = 3;
-    unsigned int spi_clk  = 2;
  
     stdio_init_all();
     uart_init(uart0, 9600);
     
     // UART pin defs
-    gpio_set_function(uart_tx, GPIO_FUNC_UART);
-    gpio_set_function(uart_rx, GPIO_FUNC_UART);
+    gpio_set_function(UART0_TX, GPIO_FUNC_UART);
+    gpio_set_function(UART0_RX, GPIO_FUNC_UART);
     printf("Hello, Midi!\n");
 
-    // SPI0 pin defs
-    gpio_set_function(spi_clk, GPIO_FUNC_SPI);
-    gpio_set_function(spi_miso, GPIO_FUNC_SPI);
-    gpio_set_function(spi_mosi, GPIO_FUNC_SPI);
-    gpio_set_function(spi_cs, GPIO_FUNC_SPI);
+    // SPI1 pin defs (ADC)
+    gpio_set_function(SPI1_SCLK, GPIO_FUNC_SPI);
+    gpio_set_function(SPI1_RX, GPIO_FUNC_SPI);
+    gpio_set_function(SPI1_TX, GPIO_FUNC_SPI);
+    gpio_set_function(SPI1_CS, GPIO_FUNC_SPI);
+
+    // SPI0 pin defs (Display)
+    gpio_set_function(SPI0_SCLK, GPIO_FUNC_SPI);
+    gpio_set_function(SPI0_RX, GPIO_FUNC_SPI);
+    gpio_set_function(SPI0_TX, GPIO_FUNC_SPI);
+    gpio_set_function(SPI0_CS, GPIO_FUNC_SPI);
+
 
     // LED pin defs
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
 
 
-    adc_global = init_adc(spi0, spi_cs);
+    adc_global = init_adc(spi0, SPI1_CS);
 
     tusb_init();
 
@@ -175,6 +178,8 @@ void midi_task(struct adc_t *adc) {
     // previous position to the last note in the sequence.
     if (previous < 0) previous = sizeof(note_sequence) - 1;
 
+
+    /*  EXAMPLE MIDI SENDING CODE
     // Send note and the velocity equal to the value of the key position we JUST pressed 
     uint8_t note_on[3] = { 0x90 | channel, note_sequence[note_pos], adc->channel_val};
     tud_midi_stream_write(cable_num, note_on, 3);
@@ -182,6 +187,17 @@ void midi_task(struct adc_t *adc) {
     // Send Note Off for previous note.
     uint8_t note_off[3] = { 0x80 | channel, note_sequence[previous], 0};
     tud_midi_stream_write(cable_num, note_off, 3);
+    */
+    //Makes use of midi.c functiosn to package and send MIDI messages in one line
+    if (send_general_midi_message(NOTE_ON,channel,note_sequence[note_pos],adc->channel_val,0)){
+        printf("MIDI NOTE ON SEND ERROR");
+    }
+    //Corresponding NOTE OFF message
+    if (send_general_midi_message(NOTE_OFF,channel, note_sequence[previous],0,0)){
+        printf("MIDI NOTE OFF SEND ERROR");
+    }
+
+   
 
     // Increment position
     note_pos++;
