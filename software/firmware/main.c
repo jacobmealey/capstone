@@ -38,31 +38,7 @@
 #include "hardware/gpio.h"
 #include "pico/stdio.h"
 
-/* This MIDI example send sequence of note (on/off) repeatedly. To test on PC, you need to install
- * synth software and midi connection management software. On
- * - Linux (Ubuntu): install qsynth, qjackctl. Then connect TinyUSB output port to FLUID Synth input port
- * - Windows: install MIDI-OX
- * - MacOS: SimpleSynth
- */
 
-//--------------------------------------------------------------------+
-// MACRO CONSTANT TYPEDEF PROTYPES
-//--------------------------------------------------------------------+
-
-/* Blink pattern
- * - 250 ms  : device not mounted
- * - 1000 ms : device mounted
- * - 2500 ms : device is suspended
- */
-enum  {
-    BLINK_NOT_MOUNTED = 250,
-    BLINK_MOUNTED = 1000,
-    BLINK_SUSPENDED = 2500,
-};
-
-static uint32_t blink_interval_ms = BLINK_NOT_MOUNTED;
-
-void led_blinking_task(void);
 void midi_task(struct adc_t *adc);
 
 int vel = 0;
@@ -103,7 +79,6 @@ int main(void) {
 
    while (1) {
         tud_task(); // tinyusb device task
-        led_blinking_task();
         midi_task(adc_global);
     }
 
@@ -111,32 +86,6 @@ int main(void) {
     return 0;
 }
 
-//--------------------------------------------------------------------+
-// Device callbacks
-//--------------------------------------------------------------------+
-
-// Invoked when device is mounted
-void tud_mount_cb(void) {
-    blink_interval_ms = BLINK_MOUNTED;
-}
-
-// Invoked when device is unmounted
-void tud_umount_cb(void) {
-    blink_interval_ms = BLINK_NOT_MOUNTED;
-}
-
-// Invoked when usb bus is suspended
-// remote_wakeup_en : if host allow us  to perform remote wakeup
-// Within 7ms, device must draw an average of current less than 2.5 mA from bus
-void tud_suspend_cb(bool remote_wakeup_en) {
-    (void) remote_wakeup_en;
-    blink_interval_ms = BLINK_SUSPENDED;
-}
-
-// Invoked when usb bus is resumed
-void tud_resume_cb(void) {
-    blink_interval_ms = BLINK_MOUNTED;
-}
 
 //--------------------------------------------------------------------+
 // MIDI Task
@@ -206,17 +155,26 @@ void midi_task(struct adc_t *adc) {
     if (note_pos >= sizeof(note_sequence)) note_pos = 0;
 }
 
-//--------------------------------------------------------------------+
-// BLINKING TASK
-//--------------------------------------------------------------------+
-void led_blinking_task(void) {
-    static uint32_t start_ms = 0;
-    static bool led_state = false;
 
-    // Blink every interval ms
-    if ( board_millis() - start_ms < blink_interval_ms) return; // not enough time
-    start_ms += blink_interval_ms;
+//--------------------------------------------------------------------+
+// Device callbacks
+//--------------------------------------------------------------------+
 
-    board_led_write(led_state);
-    led_state = 1 - led_state; // toggle
+// Invoked when device is mounted
+void tud_mount_cb(void) {
+}
+
+// Invoked when device is unmounted
+void tud_umount_cb(void) {
+}
+
+// Invoked when usb bus is suspended
+// remote_wakeup_en : if host allow us  to perform remote wakeup
+// Within 7ms, device must draw an average of current less than 2.5 mA from bus
+void tud_suspend_cb(bool remote_wakeup_en) {
+    (void) remote_wakeup_en;
+}
+
+// Invoked when usb bus is resumed
+void tud_resume_cb(void) {
 }
