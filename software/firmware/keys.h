@@ -1,5 +1,8 @@
 // keys.h
 // Authors: Jacob Mealey & Landyn Francis
+#ifndef KEYS_H
+#define KEYS_H
+
 #include <stdint.h>
 
 
@@ -26,6 +29,20 @@ typedef struct keys {
     uint8_t channel;
 } keys;
 
+extern struct keys *keyboard;
+
+//Initialization function
+struct keys *init_keys(){
+    struct keys *keys = malloc(sizeof(struct keys));
+
+    keys->channel = 0;
+    keys->octave = 3;
+    keys->volume = 64;
+    keys->keyboard = malloc(sizeof(struct key)*12);
+}
+
+
+
 // individual key functions
 
 // takes a type k and returns the midi acceptable velocity of it.
@@ -39,3 +56,6 @@ double key_get_velocity_cms(key *k);
 // assumes midi_buffer is 3 * KEY_COUNT as each key takes 3 bytes TODO check
 // returns 0 if succesfully generated midi data, 1 if not
 int generate_midi_output(keys *ks, uint8_t *midi_buffer);
+
+
+#endif
