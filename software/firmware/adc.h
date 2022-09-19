@@ -10,7 +10,7 @@
 #include "hardware/irq.h"
 
 // ADC Modes
-#define ADC_MODE_RESET 0x0001
+#define ADC_MODE_RESET 0x1000
 #define ADC_MODE_AUTO1 (0x0002 << 12) | 1u << 10
 #define ADC_MODE_AUTO2 0x3000 
 

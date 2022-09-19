@@ -60,12 +60,14 @@ int main(void) {
     gpio_set_function(SPI1_RX, GPIO_FUNC_SPI);
     gpio_set_function(SPI1_TX, GPIO_FUNC_SPI);
     gpio_set_function(SPI1_CS, GPIO_FUNC_SPI);
+    printf("alternate functions for ADC set\n");
 
     // SPI0 pin defs (Display)
     gpio_set_function(SPI0_SCLK, GPIO_FUNC_SPI);
     gpio_set_function(SPI0_RX, GPIO_FUNC_SPI);
     gpio_set_function(SPI0_TX, GPIO_FUNC_SPI);
     gpio_set_function(SPI0_CS, GPIO_FUNC_SPI);
+    printf("alternate functions for Display set\n");
 
 
     // LED pin defs
@@ -73,11 +75,15 @@ int main(void) {
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
 
 
-    adc_global = init_adc(spi0, SPI1_CS);
+    adc_global = init_adc(spi1, SPI1_CS);
+    printf("ADC initialized\n");
 
     tusb_init();
+    printf("USB initialized\n");
 
-   while (1) {
+   
+    printf("Entering main loop\n");
+    while (1) {
         tud_task(); // tinyusb device task
         midi_task(adc_global);
     }

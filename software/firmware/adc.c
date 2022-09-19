@@ -11,9 +11,9 @@ struct adc_t *init_adc(spi_inst_t *spi, uint16_t spi_cs) {
 
     struct adc_t *adc = malloc(sizeof(struct adc_t));
 
-    spi_init(spi0, 100000);
-    spi_set_format(spi, 16, 0, 0, SPI_MSB_FIRST);
     adc->spi = spi;
+    spi_init(adc->spi, 100000);
+    spi_set_format(adc->spi, 16, 0, 0, SPI_MSB_FIRST);
     adc->spi_cs = spi_cs;
     adc->control_reg = ADC_MODE_RESET;  
     // operating in manual mode
@@ -47,14 +47,12 @@ struct adc_t *init_adc(spi_inst_t *spi, uint16_t spi_cs) {
 
 bool adc_write_callback(struct repeating_timer *t) {
         (void)(t);
-        gpio_put(PICO_DEFAULT_LED_PIN, 1);
         spi_get_hw(adc_global->spi)->dr = adc_global->control_reg;
         return true;
 }
 
 void adc_read_irq(void) {
-    gpio_put(PICO_DEFAULT_LED_PIN, 0);
-    //printf("0x%04x 0x%04x\n", adc_global->control_reg, adc_global->channel_val);
+    printf("0x%04x 0x%04x\n", adc_global->control_reg, adc_global->channel_val);
     adc_global->channel_val = spi_get_hw(adc_global->spi)->dr;
     spi_get_hw(adc_global->spi)->icr = 0;
 }
