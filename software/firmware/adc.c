@@ -28,7 +28,7 @@ struct adc_t *init_adc(spi_inst_t *spi, uint16_t spi_cs) {
     adc_write_read_blocking(adc);
     printf("0x%04x 0x%04x\n", adc->control_reg, adc->channel_val);
     // set control register to continue in auto mode-2
-    adc->control_reg = ADC_MODE_AUTO2;
+    adc->control_reg = ADC_MODE_RESET;
 
     // Configure timer for SPI writes
     // timer must be allocated in heap so it lives beyond lifetime of init_adc
@@ -39,8 +39,8 @@ struct adc_t *init_adc(spi_inst_t *spi, uint16_t spi_cs) {
 
     // configure interrupt for spi reads
     spi_get_hw(adc->spi)->imsc = 1 << 1;
-    irq_add_shared_handler(SPI0_IRQ, adc_read_irq, 1);
-    irq_set_enabled(SPI0_IRQ, true);
+    irq_add_shared_handler(SPI1_IRQ, adc_read_irq, 1);
+    irq_set_enabled(SPI1_IRQ, true);
 
     return adc;
 }
@@ -52,8 +52,8 @@ bool adc_write_callback(struct repeating_timer *t) {
 }
 
 void adc_read_irq(void) {
-    printf("0x%04x 0x%04x\n", adc_global->control_reg, adc_global->channel_val);
     adc_global->channel_val = spi_get_hw(adc_global->spi)->dr;
+    printf("0x%04x 0x%04x\n", adc_global->control_reg, adc_global->channel_val);
     spi_get_hw(adc_global->spi)->icr = 0;
 }
 

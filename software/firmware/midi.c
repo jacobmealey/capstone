@@ -8,7 +8,7 @@
 #include "midi.h"
 
 uint8_t send_general_midi_message(uint8_t command_num, uint8_t channel_num, uint8_t note_num, uint8_t velocity, uint8_t pressure){
-    printf("Command number: %x\n", command_num);
+    //printf("Command number: %x\n", command_num);
 	if ((command_num != NOTE_OFF) && (command_num != NOTE_ON) && (command_num != KEY_PRESSURE)){
 		return 1;
 	}

@@ -133,23 +133,13 @@ void midi_task(struct adc_t *adc) {
     // previous position to the last note in the sequence.
     if (previous < 0) previous = sizeof(note_sequence) - 1;
 
-
-    /*  EXAMPLE MIDI SENDING CODE
-    // Send note and the velocity equal to the value of the key position we JUST pressed 
-    uint8_t note_on[3] = { 0x90 | channel, note_sequence[note_pos], adc->channel_val};
-    tud_midi_stream_write(cable_num, note_on, 3);
-
-    // Send Note Off for previous note.
-    uint8_t note_off[3] = { 0x80 | channel, note_sequence[previous], 0};
-    tud_midi_stream_write(cable_num, note_off, 3);
-    */
     //Makes use of midi.c functiosn to package and send MIDI messages in one line
-    if (send_general_midi_message(NOTE_ON,channel,note_sequence[note_pos],adc->channel_val,0)){
-        printf("MIDI NOTE ON SEND ERROR\n");
+    if (send_general_midi_message(NOTE_ON,channel,note_sequence[note_pos],adc->channel_val >> 4 ,0)){
+        //printf("MIDI NOTE ON SEND ERROR\n");
     }
     //Corresponding NOTE OFF message
     if (send_general_midi_message(NOTE_OFF,channel, note_sequence[previous],0,0)){
-        printf("MIDI NOTE OFF SEND ERROR\n");
+        //printf("MIDI NOTE OFF SEND ERROR\n");
     }
 
    

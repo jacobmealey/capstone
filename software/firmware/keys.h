@@ -9,7 +9,9 @@
 // The amount of difference between key.current_pos
 // and key.prev_pos to be considered "pressed" this
 // will most likely need to be tuned later.
-#define KEY_THRESH 10U
+#define KEY_THRESH 83U
+#define KEY_UPPER 95U
+#define KEY_LOWER 3U
 
 typedef struct key {
     uint8_t current_pos; // current position of the ADC 
