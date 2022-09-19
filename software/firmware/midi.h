@@ -21,6 +21,7 @@
 #define SYS_REAL_TIME		0xF8	//0 Data Bytes
 
 #define VOLUME_CONTROLLER	7		// Controller number to control volume
+#define MUTE_CONTROLLER		0x78	// CMM To Mute all Channels ("All sound off")
 
 //Packs up and sends "general" MIDI message
 //i.e. NOTE OFF / NOTE ON / KEY PRESSURE /
