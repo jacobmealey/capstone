@@ -2,6 +2,7 @@
 //Date Created: 9/18/22
 //Authors: Landyn Francis (landyn.francis@maine.edu) Jacob Mealey (jacob.mealey@maine.edu)
 //Purpose: Header file containing MIDI command codes, and other MIDI related defines
+
 #include <stdint.h>
 #include "bsp/board.h"
 #include "tusb.h"
@@ -28,3 +29,8 @@
 //Return Values: 0 (success) 1 (error)
 uint8_t send_general_midi_message(uint8_t command_num, uint8_t channel_num, uint8_t note_num, uint8_t velocity, uint8_t pressure);
 
+
+//Changes MIDI volume
+//Command number not needed, here always the same for volume changes
+//Volume is a 8 bit value ranging from 0 to 127 (7 bits usable).
+uint8_t change_midi_volume(uint8_t channel_num, uint8_t volume);

@@ -24,4 +24,13 @@ uint8_t send_general_midi_message(uint8_t command_num, uint8_t channel_num, uint
 	return 0;
 }
 
+uint8_t change_midi_volume(uint8_t channel_num, uint8_t volume){
+	if (volume > 127){//If volume is too large, set it to max level
+		volume=127;
+	}
+	uint8_t message[3] = {CONTROL_CHANGE|channel_num, VOLUME_CONTROLLER, volume};
+	tud_midi_stream_write(0, message, 3);
+	return 0;
+}
+
 
