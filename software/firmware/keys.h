@@ -38,7 +38,7 @@ struct keys *init_keys(){
     keys->channel = 0;
     keys->octave = 3;
     keys->volume = 64;
-    keys->keyboard = malloc(sizeof(struct key)*12);
+    //keys->keyboard = malloc(sizeof(struct key)*12); //This feels wrong
 }
 
 
