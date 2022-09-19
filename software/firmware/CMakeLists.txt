@@ -12,6 +12,7 @@ add_executable(midi_firmware
         usb_descriptors.c
         adc.c
         keys.c
+        midi.c
     )
 
 project(midi_firmware C CXX ASM)

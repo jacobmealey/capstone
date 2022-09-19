@@ -3,6 +3,9 @@
 //Authors: Landyn Francis (landyn.francis@maine.edu) Jacob Mealey (jacob.mealey@maine.edu)
 //Purpose: Header file containing MIDI command codes, and other MIDI related defines
 #include <stdint.h>
+#include "bsp/board.h"
+#include "tusb.h"
+
 //MIDI COMMAND SET
 #define NOTE_OFF			0x80	//2 Data Bytes: Note #, Velocity
 #define NOTE_ON				0x90	//2 Data Bytes: Note #, Velocity (Note ON with 0 Velocity = NOTE OFF)

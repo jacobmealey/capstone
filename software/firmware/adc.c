@@ -54,7 +54,7 @@ bool adc_write_callback(struct repeating_timer *t) {
 
 void adc_read_irq(void) {
     gpio_put(PICO_DEFAULT_LED_PIN, 0);
-    printf("0x%04x 0x%04x\n", adc_global->control_reg, adc_global->channel_val);
+    //printf("0x%04x 0x%04x\n", adc_global->control_reg, adc_global->channel_val);
     adc_global->channel_val = spi_get_hw(adc_global->spi)->dr;
     spi_get_hw(adc_global->spi)->icr = 0;
 }

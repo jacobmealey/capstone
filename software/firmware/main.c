@@ -139,11 +139,11 @@ void midi_task(struct adc_t *adc) {
     */
     //Makes use of midi.c functiosn to package and send MIDI messages in one line
     if (send_general_midi_message(NOTE_ON,channel,note_sequence[note_pos],adc->channel_val,0)){
-        printf("MIDI NOTE ON SEND ERROR");
+        printf("MIDI NOTE ON SEND ERROR\n");
     }
     //Corresponding NOTE OFF message
     if (send_general_midi_message(NOTE_OFF,channel, note_sequence[previous],0,0)){
-        printf("MIDI NOTE OFF SEND ERROR");
+        printf("MIDI NOTE OFF SEND ERROR\n");
     }
 
    
