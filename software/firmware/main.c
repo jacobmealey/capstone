@@ -43,7 +43,7 @@
 void midi_task(struct adc_t *adc);
 
 struct adc_t *adc_global;
-//struct keys *keyboard;        //Not confident enough to uncomment yet
+struct keyboard *keyboard_global;
 
 /*------------- MAIN -------------*/
 int main(void) {
@@ -51,37 +51,16 @@ int main(void) {
     stdio_init_all();
     uart_init(uart0, 9600);
     
-    // UART pin defs
-    gpio_set_function(UART0_TX, GPIO_FUNC_UART);
-    gpio_set_function(UART0_RX, GPIO_FUNC_UART);
-    printf("Hello, Midi!\n");
-
-    // SPI1 pin defs (ADC)
-    gpio_set_function(SPI1_SCLK, GPIO_FUNC_SPI);
-    gpio_set_function(SPI1_RX, GPIO_FUNC_SPI);
-    gpio_set_function(SPI1_TX, GPIO_FUNC_SPI);
-    gpio_set_function(SPI1_CS, GPIO_FUNC_SPI);
-    printf("alternate functions for ADC set\n");
-
-    // SPI0 pin defs (Display)
-    gpio_set_function(SPI0_SCLK, GPIO_FUNC_SPI);
-    gpio_set_function(SPI0_RX, GPIO_FUNC_SPI);
-    gpio_set_function(SPI0_TX, GPIO_FUNC_SPI);
-    gpio_set_function(SPI0_CS, GPIO_FUNC_SPI);
-    printf("alternate functions for Display set\n");
-
-
-    // LED pin defs
-    gpio_init(PICO_DEFAULT_LED_PIN);
-    gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
+    pin_init();
 
     //Initialize ADC
     adc_global = init_adc(spi1, SPI1_CS);
     printf("ADC initialized\n");
 
     //Initialize Keyboard
-    //keyboard = init_keys();   //Not confident enough to uncomment yet
+    keyboard_global = init_keys();   
 
+    //Initialize USB
     tusb_init();
     printf("USB initialized\n");
 
@@ -115,7 +94,7 @@ uint8_t note_sequence[] = {
 void midi_task(struct adc_t *adc) {
     static uint32_t start_ms = 0;
 
-    uint8_t const cable_num = 0; // MIDI jack associated with USB endpoint
+    //uint8_t const cable_num = 0; // MIDI jack associated with USB endpoint
     uint8_t const channel   = 0; // 0 for channel 1
     // GET most recently read key 
     if(adc == NULL) return;

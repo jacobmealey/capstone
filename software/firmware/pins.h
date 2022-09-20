@@ -5,6 +5,10 @@
 
 #ifndef PINS_H
 #define PINS_H
+#include <stdint.h>
+#include "hardware/gpio.h"
+#include "pico/stdio.h"
+#include <stdio.h>
 
 //SPI0 is the Display
 #define SPI0_RX         0
@@ -46,7 +50,11 @@
 #define ENCODE_B        27
 #define ENCODE_A        28
 
+void gpio_callback(uint gpio, uint32_t events);
 
+uint8_t pin_init();
+
+void gpio_event_string(char *buf, uint32_t events);
 
 
 #endif
