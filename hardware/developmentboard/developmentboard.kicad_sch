@@ -2322,7 +2322,7 @@
     (property "Value" "1-50uF" (id 1) (at 110.49 181.61 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "" (id 2) (at 108.9152 182.88 0)
+    (property "Footprint" "Capacitor_SMD:C_0603_1608Metric" (id 2) (at 108.9152 182.88 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (id 3) (at 107.95 179.07 0)
@@ -2705,7 +2705,7 @@
     (property "Value" "1-10uF" (id 1) (at 76.2 165.1 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "" (id 2) (at 87.3252 168.91 0)
+    (property "Footprint" "Capacitor_SMD:C_0603_1608Metric" (id 2) (at 87.3252 168.91 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (id 3) (at 86.36 165.1 0)
@@ -2927,10 +2927,10 @@
       (reference "C16") (unit 1) (value "1uF") (footprint "Capacitor_SMD:C_0603_1608Metric")
     )
     (path "/f6e9c87b-24f6-4288-9254-c44dca53d4ee"
-      (reference "C19") (unit 1) (value "1-10uF") (footprint "")
+      (reference "C19") (unit 1) (value "1-10uF") (footprint "Capacitor_SMD:C_0603_1608Metric")
     )
     (path "/b545a864-3c9e-4894-8a24-dc831b2fea0f"
-      (reference "C20") (unit 1) (value "1-50uF") (footprint "")
+      (reference "C20") (unit 1) (value "1-50uF") (footprint "Capacitor_SMD:C_0603_1608Metric")
     )
     (path "/46e16f3c-0fef-40db-8460-73b8ac70c6ab"
       (reference "J1") (unit 1) (value "SPI Header") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical")
