@@ -51,6 +51,7 @@ int main(void) {
     stdio_init_all();
     uart_init(uart0, 9600);
     
+    //Initialize GPIO pins
     pin_init();
 
     //Initialize ADC

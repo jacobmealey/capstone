@@ -85,5 +85,6 @@ void gpio_callback(uint gpio, uint32_t events)
 {
 	char event_str[128];
 	gpio_event_string(event_str, events);
-	printf("GPIO IRQ CALLBACK\n GPIO Num %d\n, Event %s\n", gpio, event_str);
+	//printf("GPIO IRQ CALLBACK\n GPIO Num %d\n, Event %s\n", gpio, event_str);
+	gpio_put(PICO_DEFAULT_LED_PIN, 0);
 }
