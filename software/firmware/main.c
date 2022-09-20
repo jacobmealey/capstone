@@ -33,6 +33,7 @@
 #include "adc.h"
 #include "pins.h"
 #include "midi.h"
+#include "keys.h"
 
 #include "hardware/spi.h"
 #include "hardware/gpio.h"
@@ -41,8 +42,8 @@
 
 void midi_task(struct adc_t *adc);
 
-int vel = 0;
 struct adc_t *adc_global;
+//struct keys *keyboard;        //Not confident enough to uncomment yet
 
 /*------------- MAIN -------------*/
 int main(void) {
@@ -74,15 +75,19 @@ int main(void) {
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
 
-
+    //Initialize ADC
     adc_global = init_adc(spi1, SPI1_CS);
     printf("ADC initialized\n");
+
+    //Initialize Keyboard
+    //keyboard = init_keys();   //Not confident enough to uncomment yet
 
     tusb_init();
     printf("USB initialized\n");
 
    
     printf("Entering main loop\n");
+
     while (1) {
         tud_task(); // tinyusb device task
         midi_task(adc_global);
