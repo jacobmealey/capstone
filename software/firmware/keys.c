@@ -17,7 +17,7 @@ int generate_midi_output(struct keyboard *ks, uint8_t *midi_buffer) {
 
 struct keyboard *init_keys(){ 
     keyboard_global->channel = 0;
-    keyboard_global->octave = 3;
+    keyboard_global->octave = 5;
     keyboard_global->volume = 64;
     for (uint32_t i = 0; i < KEY_COUNT; i++){
         keyboard_global->keys[i].current_pos = 0;

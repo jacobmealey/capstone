@@ -7,6 +7,8 @@
 #include "hardware/gpio.h"
 #include "pico/stdio.h"
 #include <stdio.h>
+#include "keys.h"
+#include "midi.h"
 
 uint8_t pin_init()
 {
@@ -42,13 +44,15 @@ uint8_t pin_init()
 	gpio_set_dir(OCT_DOWN, GPIO_IN);
 
 	gpio_init(OCT_UP);
-	gpio_set_dir(OCT_DOWN, GPIO_IN);
+	gpio_set_dir(OCT_UP, GPIO_IN);
 
 	gpio_init(ENCODE_PRESS);
 	gpio_set_dir(ENCODE_PRESS, GPIO_IN);
 
 	// GPIO Interrupt Setup
-	gpio_set_irq_enabled_with_callback(ENCODE_PRESS, GPIO_IRQ_EDGE_RISE, true, &gpio_callback);
+	gpio_set_irq_enabled_with_callback(ENCODE_PRESS, GPIO_IRQ_EDGE_FALL, true, &gpio_callback);
+	gpio_set_irq_enabled(OCT_DOWN,GPIO_IRQ_EDGE_FALL,true);
+	gpio_set_irq_enabled(OCT_UP,GPIO_IRQ_EDGE_FALL,true);
 
 	return 0;
 }
@@ -85,6 +89,26 @@ void gpio_callback(uint gpio, uint32_t events)
 {
 	char event_str[128];
 	gpio_event_string(event_str, events);
-	//printf("GPIO IRQ CALLBACK\n GPIO Num %d\n, Event %s\n", gpio, event_str);
+	printf("GPIO IRQ CALLBACK\n GPIO Num %d\n, Event %s\n", gpio, event_str);
+	
+	switch(gpio){
+		case ENCODE_PRESS:
+			mute_midi_volume(keyboard_global->channel);
+			break;
+		case OCT_DOWN:
+			//Lower octave on keyboard struct
+			keyboard_global->octave--;
+			printf("Keyboard Octave: %d\n",keyboard_global->octave);
+
+			break;
+		case OCT_UP:
+			//Increase octave on keyboard struct
+			printf("Keyboard Octave: %d\n",keyboard_global->octave);
+			keyboard_global->octave++;
+			printf("Keyboard Octave: %d\n",keyboard_global->octave);
+
+			break;
+	}
+
 	gpio_put(PICO_DEFAULT_LED_PIN, 0);
 }
