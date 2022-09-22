@@ -35,3 +35,8 @@ uint8_t send_general_midi_message(uint8_t command_num, uint8_t channel_num, uint
 //Command number not needed, here always the same for volume changes
 //Volume is a 8 bit value ranging from 0 to 127 (7 bits usable).
 uint8_t change_midi_volume(uint8_t channel_num, uint8_t volume);
+
+
+//Mutes MIDI volume
+//0x78 Controller Number in MIDI Spec
+uint8_t mute_midi_volume(uint8_t channel_num);
