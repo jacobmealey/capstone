@@ -112,28 +112,28 @@ void midi_task(struct adc_t *adc) {
     start_ms += 286;
 
     // Previous positions in the note sequence.
-    int previous = note_pos - 1;
+    //int previous = note_pos - 1;
 
     // If we currently are at position 0, set the
     // previous position to the last note in the sequence.
-    if (previous < 0) previous = sizeof(note_sequence) - 1;
+    //if (previous < 0) previous = sizeof(note_sequence) - 1;
 
     //Makes use of midi.c functiosn to package and send MIDI messages in one line
-    if (send_general_midi_message(NOTE_ON,channel,note_sequence[note_pos],adc->channel_val >> 4 ,0)){
-        //printf("MIDI NOTE ON SEND ERROR\n");
-    }
+    //if (send_general_midi_message(NOTE_ON,channel,note_sequence[note_pos],adc->channel_val >> 4 ,0)){
+    //    //printf("MIDI NOTE ON SEND ERROR\n");
+    //}
     //Corresponding NOTE OFF message
-    if (send_general_midi_message(NOTE_OFF,channel, note_sequence[previous],0,0)){
+    //if (send_general_midi_message(NOTE_OFF,channel, note_sequence[previous],0,0)){
         //printf("MIDI NOTE OFF SEND ERROR\n");
-    }
+    //}
 
    
 
     // Increment position
-    note_pos++;
+    //note_pos++;
 
     // If we are at the end of the sequence, start over.
-    if (note_pos >= sizeof(note_sequence)) note_pos = 0;
+    //if (note_pos >= sizeof(note_sequence)) note_pos = 0;
 }
 
 

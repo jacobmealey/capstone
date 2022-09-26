@@ -1,5 +1,8 @@
 #include "adc.h"
 #include <stdio.h>
+#include "pins.h"
+#include "midi.h"
+#include "keys.h"
 
 struct adc_t *init_adc(spi_inst_t *spi, uint16_t spi_cs) {
     // The adc will work in auto-mode 2 which is defined as auto
@@ -12,7 +15,7 @@ struct adc_t *init_adc(spi_inst_t *spi, uint16_t spi_cs) {
     struct adc_t *adc = malloc(sizeof(struct adc_t));
 
     adc->spi = spi;
-    spi_init(adc->spi, 100000);
+    spi_init(adc->spi, 10000);
     spi_set_format(adc->spi, 16, 0, 0, SPI_MSB_FIRST);
     adc->spi_cs = spi_cs;
     adc->control_reg = ADC_MODE_RESET;  
@@ -51,10 +54,26 @@ bool adc_write_callback(struct repeating_timer *t) {
         return true;
 }
 
+// Callback function called after each ADC read
 void adc_read_irq(void) {
-    adc_global->channel_val = spi_get_hw(adc_global->spi)->dr;
-    printf("0x%04x 0x%04x\n", adc_global->control_reg, adc_global->channel_val);
-    spi_get_hw(adc_global->spi)->icr = 0;
+    adc_global->channel_val = spi_get_hw(adc_global->spi)->dr; //Set channel value
+    printf("0x%04x 0x%04x\n", adc_global->control_reg, adc_global->channel_val); //Print value
+    printf("Pressed: %d\n",keyboard_global->keys[0].pressed);
+    if (adc_global -> channel_val < KEY_THRESH){
+        keyboard_global->keys[0].pressed = 1;
+        printf("Pressed: %d\n",keyboard_global->keys[0].pressed);
+        if (send_general_midi_message(NOTE_ON,0,90,adc_global->channel_val >> 4 ,0)){
+        //printf("MIDI NOTE ON SEND ERROR\n");
+        }
+    }
+    if (keyboard_global->keys[0].pressed == 1 && adc_global -> channel_val > KEY_THRESH){
+        keyboard_global->keys[0].pressed = 0;
+        printf("Pressed: %d\n",keyboard_global->keys[0].pressed);
+        if (send_general_midi_message(NOTE_OFF,0,90,0 ,0)){
+        //printf("MIDI NOTE OFF SEND ERROR\n");
+        }
+    } 
+    spi_get_hw(adc_global->spi)->icr = 0;//Reset SPI Interrupt Control Register
 }
 
 int adc_write_read_blocking(struct adc_t *adc) {

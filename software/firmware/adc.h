@@ -35,6 +35,7 @@
 // Enabling all channels for the 12 bit ADC
 #define ADC_PROG_ENALL 0x0FFF
 
+
 struct adc_t {
     spi_inst_t *spi;
     uint16_t control_reg;

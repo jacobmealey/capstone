@@ -23,10 +23,11 @@
 #define LED_3           7
 
 //SPI1 is the ADC
+#define SPI1_TX         11
 #define SPI1_RX         12
 #define SPI1_CS         13
 #define SPI1_SCLK       14
-#define SPI1_TX         11
+
 
 //UART for Printing Debug Messages
 #define UART0_TX        16

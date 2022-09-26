@@ -1,4 +1,5 @@
 #include "keys.h"
+#include "stdlib.h"
 
 uint8_t key_get_velocity(key *k) {
     // TODO
@@ -15,12 +16,16 @@ int generate_midi_output(struct keyboard *ks, uint8_t *midi_buffer) {
     return 0;
 }
 
-struct keyboard *init_keys(){ 
-    keyboard_global->channel = 0;
-    keyboard_global->octave = 5;
-    keyboard_global->volume = 64;
+struct keyboard *init_keys(){
+    struct keyboard *keyb = malloc(sizeof(struct keyboard));
+
+    keyb->channel = 0;
+    keyb->octave = 5;
+    keyb->volume = 64;
     for (uint32_t i = 0; i < KEY_COUNT; i++){
-        keyboard_global->keys[i].current_pos = 0;
-        keyboard_global->keys[i].prev_pos = 0;
+        keyb->keys[i].current_pos = 0;
+        keyb->keys[i].prev_pos = 0;
+        keyb->keys[i].pressed = 0;
     }
+    return keyb;
 }
