@@ -14,6 +14,7 @@ add_executable(midi_firmware
         keys.c
         midi.c
         gpio.c
+        display.c
     )
 
 project(midi_firmware C CXX ASM)
