@@ -16,6 +16,10 @@
 #define SPI0_SCLK       2
 #define SPI0_TX         3
 
+//Other Display GPIO
+#define DISPLAY_RESET	9
+#define TFT_DC			10
+
 //Four Status/Debugging LED's
 #define LED_0           4
 #define LED_1           5
