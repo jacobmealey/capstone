@@ -29,5 +29,5 @@ Comment,Designator,Footprint,LCSC
 "RotaryEncoder_Switch","SW4","Rotary_Encoder:RotaryEncoder_Alps_EC11E-Switch_Vertical_H20mm","C278348"
 "MCP1603","U2","Package_TO_SOT_SMD:TSOT-23-5","C150803"
 "RP2040","U3","RP2040_minimal:RP2040-QFN-56","C9900024873"
-"W25Q128JVSIM","U4","Package_SO:SOIC-8_7.5x5.85mm_P1.27mm","C2613930"
+"W25Q128JVSIM","U4","Package_SO:SOIC-8W_5.3x5.3mm_P1.27mm","C2613930"
 "Crystal_GND24","Y1","Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm","C133334"
