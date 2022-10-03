@@ -3326,7 +3326,7 @@
     (property "Value" "RP2040" (id 1) (at 160.7694 157.48 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "Package_DFN_QFN:QFN-56-1EP_7x7mm_P0.4mm_EP3.2x3.2mm" (id 2) (at 139.7 104.14 0)
+    (property "Footprint" "RP2040_minimal:RP2040-QFN-56" (id 2) (at 139.7 104.14 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "" (id 3) (at 139.7 104.14 0)
@@ -5879,7 +5879,7 @@
       (reference "U2") (unit 1) (value "MCP1603") (footprint "Package_TO_SOT_SMD:TSOT-23-5")
     )
     (path "/26309b49-910b-44e4-84c1-8d3b7988a81c"
-      (reference "U3") (unit 1) (value "RP2040") (footprint "Package_DFN_QFN:QFN-56-1EP_7x7mm_P0.4mm_EP3.2x3.2mm")
+      (reference "U3") (unit 1) (value "RP2040") (footprint "RP2040_minimal:RP2040-QFN-56")
     )
     (path "/70170b34-5bfa-4c43-b44d-5d4dc37abfec"
       (reference "U4") (unit 1) (value "W25Q128JVSIM") (footprint "Package_SO:SOIC-8W_5.3x5.3mm_P1.27mm")
