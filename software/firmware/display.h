@@ -88,9 +88,10 @@
 struct disp_t {
     spi_inst_t *spi;
     uint16_t dc;
+    uint16_t cs;
 };
 
-struct disp_t *disp_global;
+extern struct disp_t *disp_global;
 
 int init_disp(struct disp_t *disp, spi_inst_t *spi, uint16_t disp_dc);
-int disp_wr_cmd(struct disp_t *disp, uint8_t command, uint8_t *args, uint8_t len);
+int disp_wr_cmd(struct disp_t *disp, uint8_t command, uint8_t *args, unsigned int len);

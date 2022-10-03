@@ -4,6 +4,7 @@
 //
 
 #include "display.h"
+#include "pins.h"
 
 
 // disp - a higher variable passed in from the calling funciton. This is different
@@ -16,8 +17,19 @@ int init_disp(struct disp_t *disp, spi_inst_t *spi, uint16_t disp_dc) {
     }
     disp->spi = spi;
     disp->dc = disp_dc;
+    disp->cs = SPI0_CS;
     disp_global = disp; 
+
+    spi_init(disp->spi, 1000 * 80000);
+    spi_set_format(disp->spi, 8, 0, 0, SPI_MSB_FIRST);
+ 
     
+    gpio_init(disp->dc);
+    gpio_set_dir(disp->dc, GPIO_OUT);
+    
+    gpio_init(disp->cs);
+    gpio_set_dir(disp->cs, GPIO_OUT);
+
     uint8_t command_buffer[16];
 
     disp_wr_cmd(disp_global, DISP_SWRST, NULL, 0);
@@ -67,29 +79,31 @@ int init_disp(struct disp_t *disp, spi_inst_t *spi, uint16_t disp_dc) {
     command_buffer[1] = 0x00;
     command_buffer[2] = 0x00;
     command_buffer[3] = 0x7F;
-    disp_wr_cmd(disp_global, DISP_CASET, command_buffer, 1);
+    disp_wr_cmd(disp_global, DISP_CASET, command_buffer, 4);
     command_buffer[0] = 0x00;
     command_buffer[1] = 0x00;
     command_buffer[2] = 0x00;
     command_buffer[3] = 0x9F;
-    disp_wr_cmd(disp_global, DISP_RASET, command_buffer, 1);
+    disp_wr_cmd(disp_global, DISP_RASET, command_buffer, 4);
     disp_wr_cmd(disp_global, DISP_NORON, NULL, 0);
     sleep_ms(10);
     disp_wr_cmd(disp_global, DISP_DISPON, NULL, 0);
     sleep_ms(100);
-    disp_wr_cmd(disp_global, DISP_RAMWR, NULL, 0);
 
     return 0;
 }
 
 
 
-int disp_wr_cmd(struct disp_t *disp, uint8_t command, uint8_t *args, uint8_t len) {
+int disp_wr_cmd(struct disp_t *disp, uint8_t command, uint8_t *args, unsigned int len) {
+    gpio_put(disp->cs, 0);
     gpio_put(disp->dc, 0);
     spi_write_blocking(disp->spi, &command, 1);
     gpio_put(disp->dc, 1);
-    
-    spi_write_blocking(disp->spi, args, len);
+    if(len != 0) {
+        spi_write_blocking(disp->spi, args, len);
+    }
+    gpio_put(disp->cs, 1);
 
     return 0;
 }

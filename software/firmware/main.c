@@ -34,22 +34,26 @@
 #include "pins.h"
 #include "midi.h"
 #include "keys.h"
+#include "display.h"
 
 #include "hardware/spi.h"
 #include "hardware/gpio.h"
 #include "pico/stdio.h"
 
+#define DISP_SIZE 160 * 128 * 3
 
 void midi_task(struct adc_t *adc);
 
 struct adc_t *adc_global;
 struct keyboard *keyboard_global;
+struct disp_t *disp_global;
 
 /*------------- MAIN -------------*/
 int main(void) {
  
     stdio_init_all();
     uart_init(uart0, 9600);
+    struct disp_t disp;
     
     //Initialize GPIO pins
     pin_init();
@@ -61,16 +65,31 @@ int main(void) {
     //Initialize Keyboard
     keyboard_global = init_keys();   
 
+
     //Initialize USB
-    tusb_init();
+    //tusb_init();
     printf("USB initialized\n");
 
-   
+    printf("initializing display");
+    init_disp(&disp, spi0, TFT_DC);
     printf("Entering main loop\n");
 
+    uint8_t buffer[DISP_SIZE];
+    int shift = 0;
+    int color = 0;
+    for(int i = 0; i < DISP_SIZE; i += 3) {
+        buffer[i] = 0xF0;
+        buffer[i + 1] = 0x0F;
+        buffer[i + 2] = 0x00;
+    }
+    int state = 0;
+    disp_wr_cmd(&disp, DISP_RAMWR, buffer, DISP_SIZE);
+    disp_wr_cmd(&disp, DISP_NOP, NULL, 0);
+    sleep_ms(100);
     while (1) {
-        tud_task(); // tinyusb device task
-        midi_task(adc_global);
+        //tud_task(); // tinyusb device task
+        //midi_task(adc_global);
+        sleep_ms(500);
     }
 
 
