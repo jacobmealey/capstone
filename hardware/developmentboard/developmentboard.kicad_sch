@@ -838,7 +838,6 @@
     )
   )
 
-
   (junction (at 242.57 104.14) (diameter 0) (color 0 0 0 0)
     (uuid 18500bd6-3e6e-4bb5-a4c9-1ad75bb17749)
   )
@@ -2159,7 +2158,7 @@
     (property "Datasheet" "http://www.ti.com/lit/ds/symlink/lm4040-n.pdf" (id 3) (at 128.27 170.18 0)
       (effects (font (size 1.27 1.27) italic) hide)
     )
-    (property "LCSC" "C2932681" (id 4) (at 128.27 170.18 0)
+    (property "LCSC" "C134019" (id 4) (at 128.27 170.18 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid 6139f5b9-178e-41dc-b714-6408309997e2))
