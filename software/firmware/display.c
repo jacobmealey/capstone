@@ -20,7 +20,7 @@ int init_disp(struct disp_t *disp, spi_inst_t *spi, uint16_t disp_dc) {
     disp->cs = SPI0_CS;
     disp_global = disp; 
 
-    spi_init(disp->spi, 1000 * 80000);
+    spi_init(disp->spi, 1000 * 10000);
     spi_set_format(disp->spi, 8, 0, 0, SPI_MSB_FIRST);
  
     
