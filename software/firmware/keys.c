@@ -23,7 +23,7 @@ struct keyboard *init_keys(){
     keyb->octave = 5;
     keyb->volume = 64;
     for (uint32_t i = 0; i < KEY_COUNT; i++){
-        keyb->keys[i].current_pos = 0;
+        keyb->keys[i].current_pos = 0x5C;
         keyb->keys[i].prev_pos = 0;
         keyb->keys[i].pressed = 0;
     }

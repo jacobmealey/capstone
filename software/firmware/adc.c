@@ -60,7 +60,8 @@ void adc_read_irq(void) {
     printf("0x%04x 0x%04x\n", adc_global->control_reg, adc_global->channel_val); //Print value
     
     keyboard_global->keys[ADC_PRV_CHAN(adc_global->channel_val)].current_pos = ADC_8BIT_VAL(adc_global->channel_val);
-
+    printf("Current: %d, Prev: %d\n",keyboard_global->keys[ADC_PRV_CHAN(adc_global->channel_val)].current_pos,
+                                    keyboard_global->keys[ADC_PRV_CHAN(adc_global->channel_val)].prev_pos);
     if (adc_global -> channel_val < KEY_THRESH){
         keyboard_global->keys[0].pressed = 1;
         if (send_general_midi_message(NOTE_ON,0,90,adc_global->channel_val >> 4 ,0)){
