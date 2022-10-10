@@ -109,13 +109,16 @@ int disp_wr_cmd(struct disp_t *disp, uint8_t command, uint8_t *args, unsigned in
 }
 
 
-
+// screen is the "easy" to interract with form of display data, each element
+// in screen corresponds to 1 pixel, formattted like: 0x0RGB.
+// disp is the formmatted version of screen to be written to the SPI bus
 int screan_to_disp(uint16_t *screen, uint8_t *disp, int screen_len) {
     uint8_t acc = 0; // accumulator for screen translation
-    int acc_set = 0;
-    int i = 0; 
-    int bi = 0;
-    while(i< screen_len) {
+    int acc_set = 0; // variable to check accumlator
+    int i = 0; // the current pixel in the screen array
+    int bi = 0; // the current byte being set in disp
+
+    while(i < screen_len) {
         if(acc_set  == 0) { // if acc is empty
             disp[bi] = (screen[i] >> 4) & 0xFF;
             acc = screen[i] & 0xF;
@@ -129,7 +132,10 @@ int screan_to_disp(uint16_t *screen, uint8_t *disp, int screen_len) {
            bi++;
         }
         if(acc_set == 1){ // final case - acc lowest half is set
+            // write acc to the highest part of disp
+            // and write the highest part of screen 
             disp[bi] = ((acc << 4) & 0xF0) | ((screen[i] >> 8) & 0x0F);
+            // save the lower 2/3 of screen to acc and set where to next
             acc = screen[i] & 0xFF; 
             acc_set = 2;
             bi++;
@@ -138,3 +144,4 @@ int screan_to_disp(uint16_t *screen, uint8_t *disp, int screen_len) {
     }
     return bi;
 }
+
