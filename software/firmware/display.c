@@ -186,11 +186,12 @@ int draw_rect(uint8_t x, uint8_t y, uint8_t h, uint8_t w, uint16_t color){
    // go the the x position
    set_x(x);
   
+   if(!(w % 3)) w += w%3;
    // loop through h values, draw a new line of the screen
    // at every incrementing h
    for(int i = 0; i < h; i++) {
        set_y(y+i);
-       disp_wr_cmd(disp_global, DISP_RAMWR, buffer, 14);
+       disp_wr_cmd(disp_global, DISP_RAMWR, buffer, (w*3) / 2);
    }
 
    // reset x and y to zero;
@@ -202,40 +203,50 @@ int draw_rect(uint8_t x, uint8_t y, uint8_t h, uint8_t w, uint16_t color){
 }
 
 
-void draw_string(const char *c, uint8_t x, uint8_t y){
+// Draw a string of characters to the display and location x,y 
+// str - a null terminatd string of characters. 
+void draw_string(const char *str, uint8_t x, uint8_t y, uint16_t font_bg, uint16_t font_fg){
     set_x(x);
     set_y(y);
-    while(*c != '\0' || y < 5 || x < 5 || x > DISPLAY_W || y > DISPLAY_HEIGHT) {
-        draw_char(*c, x, y);
+    // loop until the the null character is met
+    while(*str != '\0' || y < 5 || x < 5 || x > DISPLAY_W || y > DISPLAY_HEIGHT) {
+        draw_char(*str, x, y, font_bg, font_fg);
         y -= 6;
-        c++;
+        str++;
     }
 }
 
 
-
-void draw_char(char c, uint8_t x, uint8_t y) {
-    uint8_t character[5];
-    uint16_t screen[7];
-    uint8_t buffer[16];
+// Draw a single character to the display
+// c - character to draw
+// x - x location to draw display
+// y - y location to draw the display
+void draw_char(char c, uint8_t x, uint8_t y, uint16_t font_bg, uint16_t font_fg) {
+    static uint8_t character[5];
+    static uint16_t screen[7];
+    static uint8_t buffer[16];
 
     memcpy(character, font + 5*c, 5); 
     if(y == 0) y = 6;
     if(x == 0) x = 1;
 
-    set_x(x - 7);
 
+    draw_rect(x-7, y-5, 7, 9, font_bg);
+    set_x(x - 7);
     for(int i = 0; i < 5; i++){ //loop through lines
-        for(int j = 0; j < 7; j++){ //loop through pixels
-            screen[j] = ((character[i] >> j) & 1u) ? 0x000: 0xFFF;
+        for(int j = 0; j < 7; j++){ //loop through pixels of current line
+            screen[j] = ((character[i] >> j) & 1u) ? font_fg: font_bg;
         }
-        set_y(y - i);
-        screan_to_disp(screen, buffer, 7);
+        set_y(y - i); // move to to next line
+        // write current line to the display
+        screan_to_disp(screen, buffer, 7); 
         disp_wr_cmd(disp_global, DISP_RAMWR, buffer, 11);
     }
 
 }
 
+// this a test to draw the font - it uses some static variables 
+// so to use draw_font_test just run it in main loop with nothing else
 void draw_font_test() {
     static int offset = 0;
     static int x;
@@ -247,6 +258,7 @@ void draw_font_test() {
 
     if(offset > 3125) return;
 
+    // get current character
     memcpy(character, font + offset, 5); 
     if(y == 0) y = 6;
     if(x == 0) x = 1;
@@ -259,9 +271,9 @@ void draw_font_test() {
         screan_to_disp(screen, buffer, 7);
         disp_wr_cmd(disp_global, DISP_RAMWR, buffer, 11);
     }
-    x++;
 
-    x += 7;
+    // update x and ys accordingly
+    x += 8;
     offset += 5;
 
     if(x > DISPLAY_W - 7) {

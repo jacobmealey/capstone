@@ -95,6 +95,18 @@ struct disp_t {
     uint16_t cs;
 };
 
+enum display_colors {
+    RED = 0xF00,
+    GREEN = 0x0F0,
+    BLUE = 0x00F,
+    PURPLE = 0xF0F,
+    YELLOW = 0xFF0,
+    ORANGE = 0xF70,
+    PINK = 0xF88,
+    BLACK = 0x000,
+    WHITE = 0xFFF,
+};
+
 extern struct disp_t *disp_global;
 
 int init_disp(struct disp_t *disp, spi_inst_t *spi, uint16_t disp_dc);
@@ -108,8 +120,8 @@ void set_y(uint8_t y);
 int draw_rect(uint8_t x, uint8_t y, uint8_t h, uint8_t w, uint16_t color);
 
 void draw_font_test();
-void draw_char(char c, uint8_t x, uint8_t y);
-void draw_string(const char *c, uint8_t x, uint8_t y);
+void draw_char(char c, uint8_t x, uint8_t y, uint16_t font_bg, uint16_t font_fg);
+void draw_string(const char *c, uint8_t x, uint8_t y, uint16_t font_bg, uint16_t font_fg);
 #endif
 
 

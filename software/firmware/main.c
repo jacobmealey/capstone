@@ -81,7 +81,6 @@ int main(void) {
         printf("SCREEN BASED\n");
     }
 
-    uint16_t colors[5] = {0x0FF, 0x0F0, 0x00F, 0xF0F, 0xFF0};
     for(int i = 0; i < screen_size; i++) {
         screen[i] = 0xFFF;
     }
@@ -90,13 +89,16 @@ int main(void) {
 
     disp_wr_cmd(&disp, DISP_RAMWR, buffer, DISP_SIZE);
     disp_wr_cmd(&disp, DISP_NOP, NULL, 0);
-    int i = 1; 
-    int k = 0;
+
+    draw_rect(10, 10, 30, 54, ORANGE);
+    draw_rect(100, 56, 15, 12, PURPLE);
+
     while (1) {
         // draw_font_test();
-        draw_string("Velocity: 2.5cm/s", 45, 125);
+        draw_string("Velocity: 2.5cm/s", 45, 125, PINK, BLUE);
         //tud_task(); // tinyusb device tast
         //midi_task(adc_global);
+        sleep_ms(100);
     }
 
 
