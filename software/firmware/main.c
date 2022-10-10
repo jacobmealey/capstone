@@ -40,7 +40,7 @@
 #include "hardware/gpio.h"
 #include "pico/stdio.h"
 
-#define DISP_SIZE 160 * 128 * 3
+#define DISP_SIZE 30720
 
 void midi_task(struct adc_t *adc);
 
@@ -75,18 +75,25 @@ int main(void) {
     printf("Entering main loop\n");
 
     uint8_t buffer[DISP_SIZE];
-    int shift = 0;
-    int color = 0;
-    for(int i = 0; i < DISP_SIZE; i += 3) {
-        buffer[i] = 0xF0;
-        buffer[i + 1] = 0x0F;
-        buffer[i + 2] = 0x00;
+    int screen_size = 128*160;
+    uint16_t *screen = malloc(screen_size * sizeof(uint16_t));
+    if (screen == NULL) {
+        printf("SCREEN BASED\n");
     }
-    int state = 0;
-    disp_wr_cmd(&disp, DISP_RAMWR, buffer, DISP_SIZE);
-    disp_wr_cmd(&disp, DISP_NOP, NULL, 0);
-    sleep_ms(100);
+
+    uint16_t colors[5] = {0xF00, 0x0F0, 0x00F, 0xF0F, 0xFF0};
+    int k = 0;
     while (1) {
+        for(int i = 0; i < screen_size; i++) {
+            screen[i] = colors[k];
+        }
+        k++; 
+        k %= 5;
+
+        screan_to_disp(screen, buffer, screen_size);
+
+        disp_wr_cmd(&disp, DISP_RAMWR, buffer, DISP_SIZE);
+        disp_wr_cmd(&disp, DISP_NOP, NULL, 0);
         //tud_task(); // tinyusb device task
         //midi_task(adc_global);
         sleep_ms(500);

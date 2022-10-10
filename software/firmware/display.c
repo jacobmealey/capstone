@@ -110,3 +110,31 @@ int disp_wr_cmd(struct disp_t *disp, uint8_t command, uint8_t *args, unsigned in
 
 
 
+int screan_to_disp(uint16_t *screen, uint8_t *disp, int screen_len) {
+    uint8_t acc = 0; // accumulator for screen translation
+    int acc_set = 0;
+    int i = 0; 
+    int bi = 0;
+    while(i< screen_len) {
+        if(acc_set  == 0) { // if acc is empty
+            disp[bi] = (screen[i] >> 4) & 0xFF;
+            acc = screen[i] & 0xF;
+            acc_set = 1;
+            bi++;
+            i++;
+        } 
+        if(acc_set == 2) { // if the top half of acc is set 
+           disp[bi] = acc;
+           acc_set = 0;
+           bi++;
+        }
+        if(acc_set == 1){ // final case - acc lowest half is set
+            disp[bi] = ((acc << 4) & 0xF0) | ((screen[i] >> 8) & 0x0F);
+            acc = screen[i] & 0xFF; 
+            acc_set = 2;
+            bi++;
+            i++;
+        }
+    }
+    return bi;
+}
