@@ -81,22 +81,22 @@ int main(void) {
         printf("SCREEN BASED\n");
     }
 
-    uint16_t colors[5] = {0xF00, 0x0F0, 0x00F, 0xF0F, 0xFF0};
+    uint16_t colors[5] = {0x0FF, 0x0F0, 0x00F, 0xF0F, 0xFF0};
+    for(int i = 0; i < screen_size; i++) {
+        screen[i] = 0xFFF;
+    }
+
+    screan_to_disp(screen, buffer, screen_size);
+
+    disp_wr_cmd(&disp, DISP_RAMWR, buffer, DISP_SIZE);
+    disp_wr_cmd(&disp, DISP_NOP, NULL, 0);
+    int i = 1; 
     int k = 0;
     while (1) {
-        for(int i = 0; i < screen_size; i++) {
-            screen[i] = colors[k];
-        }
-        k++; 
-        k %= 5;
-
-        screan_to_disp(screen, buffer, screen_size);
-
-        disp_wr_cmd(&disp, DISP_RAMWR, buffer, DISP_SIZE);
-        disp_wr_cmd(&disp, DISP_NOP, NULL, 0);
-        //tud_task(); // tinyusb device task
+        // draw_font_test();
+        draw_string("Velocity: 2.5cm/s", 45, 125);
+        //tud_task(); // tinyusb device tast
         //midi_task(adc_global);
-        sleep_ms(500);
     }
 
 

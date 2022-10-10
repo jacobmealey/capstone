@@ -5,6 +5,9 @@
 
 #include "display.h"
 #include "pins.h"
+#include "font.h"
+
+#include <string.h>
 
 
 // disp - a higher variable passed in from the calling funciton. This is different
@@ -145,3 +148,125 @@ int screan_to_disp(uint16_t *screen, uint8_t *disp, int screen_len) {
     return bi;
 }
 
+void set_x(uint8_t x) {
+    if(x > DISPLAY_W) x = DISPLAY_W;
+    uint8_t command_buffer[4];
+    command_buffer[0] = 0x00;
+    command_buffer[1] = x;
+    command_buffer[2] = 0x00;
+    command_buffer[3] = 0x7F;
+    disp_wr_cmd(disp_global, DISP_CASET, command_buffer, 4);
+}
+
+void set_y(uint8_t y) {
+    if(y > DISPLAY_HEIGHT) y = DISPLAY_HEIGHT;
+    uint8_t command_buffer[4];
+    command_buffer[0] = 0x00;
+    command_buffer[1] = y;
+    command_buffer[2] = 0x00;
+    command_buffer[3] = 0x9F;
+    disp_wr_cmd(disp_global, DISP_RASET, command_buffer, 4);
+}
+
+
+// draws a rectangle at location x,y with height h amd width w
+// it fills it with color.
+int draw_rect(uint8_t x, uint8_t y, uint8_t h, uint8_t w, uint16_t color){
+   // static because they shouldn't be allocated everytime?
+   static uint16_t screen[128];
+   static uint8_t buffer[200];
+   
+   //screen is a single "row" of the rect, so only fill to w
+   for(int i = 0; i < w + 1; i++) {
+       screen[i] = color;
+   }
+
+   // convert screen to w
+   screan_to_disp(screen, buffer, w);
+   // go the the x position
+   set_x(x);
+  
+   // loop through h values, draw a new line of the screen
+   // at every incrementing h
+   for(int i = 0; i < h; i++) {
+       set_y(y+i);
+       disp_wr_cmd(disp_global, DISP_RAMWR, buffer, 14);
+   }
+
+   // reset x and y to zero;
+   set_x(0);
+   set_y(0);
+   
+   return 0;
+
+}
+
+
+void draw_string(const char *c, uint8_t x, uint8_t y){
+    set_x(x);
+    set_y(y);
+    while(*c != '\0' || y < 5 || x < 5 || x > DISPLAY_W || y > DISPLAY_HEIGHT) {
+        draw_char(*c, x, y);
+        y -= 6;
+        c++;
+    }
+}
+
+
+
+void draw_char(char c, uint8_t x, uint8_t y) {
+    uint8_t character[5];
+    uint16_t screen[7];
+    uint8_t buffer[16];
+
+    memcpy(character, font + 5*c, 5); 
+    if(y == 0) y = 6;
+    if(x == 0) x = 1;
+
+    set_x(x - 7);
+
+    for(int i = 0; i < 5; i++){ //loop through lines
+        for(int j = 0; j < 7; j++){ //loop through pixels
+            screen[j] = ((character[i] >> j) & 1u) ? 0x000: 0xFFF;
+        }
+        set_y(y - i);
+        screan_to_disp(screen, buffer, 7);
+        disp_wr_cmd(disp_global, DISP_RAMWR, buffer, 11);
+    }
+
+}
+
+void draw_font_test() {
+    static int offset = 0;
+    static int x;
+    static int y;
+
+    uint8_t character[5];
+    uint16_t screen[7];
+    uint8_t buffer[16];
+
+    if(offset > 3125) return;
+
+    memcpy(character, font + offset, 5); 
+    if(y == 0) y = 6;
+    if(x == 0) x = 1;
+
+    for(int i = 0; i < 5; i++){ //loop through lines
+        for(int j = 0; j < 7; j++){ //loop through pixels
+            screen[j] = ((character[i] >> j) & 1u) ? 0x000: 0xFFF;
+        }
+        set_y(y - i);
+        screan_to_disp(screen, buffer, 7);
+        disp_wr_cmd(disp_global, DISP_RAMWR, buffer, 11);
+    }
+    x++;
+
+    x += 7;
+    offset += 5;
+
+    if(x > DISPLAY_W - 7) {
+        x = 1;
+        y += 6;
+    }
+    set_x(x);
+}

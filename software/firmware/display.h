@@ -1,3 +1,5 @@
+#ifndef DISPLAY_H
+#define DISPLAY_H
 // display.c 
 // Authors: Jacob Mealey <jacob.mealey@maine.edu>
 //          Landyn Francis <landyn.francis@maine.edu>
@@ -21,6 +23,8 @@
 #include "hardware/gpio.h"
 #include "hardware/irq.h"
 
+#define DISPLAY_W 128
+#define DISPLAY_HEIGHT 160
 
 
 // List of commands from pg. 77 of ST7735 Datasheet
@@ -97,3 +101,17 @@ int init_disp(struct disp_t *disp, spi_inst_t *spi, uint16_t disp_dc);
 int disp_wr_cmd(struct disp_t *disp, uint8_t command, uint8_t *args, unsigned int len);
 
 int screan_to_disp(uint16_t *screen, uint8_t *disp, int screen_len);
+
+void set_x(uint8_t x);
+void set_y(uint8_t y);
+
+int draw_rect(uint8_t x, uint8_t y, uint8_t h, uint8_t w, uint16_t color);
+
+void draw_font_test();
+void draw_char(char c, uint8_t x, uint8_t y);
+void draw_string(const char *c, uint8_t x, uint8_t y);
+#endif
+
+
+
+
