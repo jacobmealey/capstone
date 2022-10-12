@@ -59,8 +59,6 @@ void adc_read_irq(void) {
     adc_global->channel_val = spi_get_hw(adc_global->spi)->dr; //Set channel value
     uint8_t current_channel = ADC_PRV_CHAN(adc_global->channel_val);
     uint8_t current_value = ADC_8BIT_VAL(adc_global->channel_val);
-
-
     printf("0x%04x 0x%04x\n", adc_global->control_reg, adc_global->channel_val); //Print value
     keyboard_global->keys[current_channel].current_pos = current_value; //Update keys struct
 
@@ -69,7 +67,8 @@ void adc_read_irq(void) {
     
     if (current_value < KEY_THRESH && 
             keyboard_global->keys[current_channel].pressed == 0 &&
-            keyboard_global->keys[current_channel].prev_pos > keyboard_global->keys[current_channel].current_pos){
+            keyboard_global->keys[current_channel].prev_pos > keyboard_global->keys[current_channel].current_pos)
+        {
         keyboard_global->keys[current_channel].pressed = 1;
 
         uint8_t velocity = 
