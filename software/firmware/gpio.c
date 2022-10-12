@@ -60,7 +60,7 @@ uint8_t pin_init()
 	gpio_set_irq_enabled_with_callback(ENCODE_PRESS, GPIO_IRQ_EDGE_FALL, true, &gpio_callback);
 	gpio_set_irq_enabled(OCT_DOWN,GPIO_IRQ_EDGE_FALL,true);
 	gpio_set_irq_enabled(OCT_UP,GPIO_IRQ_EDGE_FALL,true);
-	gpio_set_irq_enabled(ENCODE_A, GPIO_IRQ_EDGE_RISE, true);
+	gpio_set_irq_enabled(ENCODE_A, GPIO_IRQ_EDGE_FALL, true);
 	//gpio_set_irq_enabled(ENCODE_B, GPIO_IRQ_EDGE_RISE, true);
 	return 0;
 }
@@ -90,13 +90,7 @@ void gpio_event_string(char *buf, uint32_t events) {
             }
         }
     }
-    *buf++ = '\0';
-}
-
-void gpio_callback(uint gpio, uint32_t events)
-{
 	char event_str[128];
-	int status;
 	int volume_offset;
 	gpio_event_string(event_str, events);
 	printf("GPIO IRQ CALLBACK\n GPIO Num %d\n, Event %s\n", gpio, event_str);
@@ -118,7 +112,6 @@ void gpio_callback(uint gpio, uint32_t events)
 			printf("Keyboard Octave: %d\n",keyboard_global->octave);
 			break;
 		case ENCODE_A:
-			status = save_and_disable_interrupts();
 			volume_offset = 0;
 			if(gpio_get(ENCODE_B)==0){ //Clockwise
 				printf("VOLUME UP\n");
@@ -132,9 +125,7 @@ void gpio_callback(uint gpio, uint32_t events)
 			}
 			printf("Volume offset:%d\n", volume_offset);
 			//change_midi_volume(0,keyboard_global->volume);//This can move to the main function I think
-			restore_interrupts(status);
 			break;
 	}
-
 	gpio_put(PICO_DEFAULT_LED_PIN, 0);
 }
