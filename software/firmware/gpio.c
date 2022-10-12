@@ -90,6 +90,11 @@ void gpio_event_string(char *buf, uint32_t events) {
             }
         }
     }
+    *buf++ = '\0';
+}
+
+void gpio_callback(uint gpio, uint32_t events)
+{
 	char event_str[128];
 	int volume_offset;
 	gpio_event_string(event_str, events);
