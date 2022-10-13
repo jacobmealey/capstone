@@ -121,12 +121,21 @@ void gpio_callback(uint gpio, uint32_t events)
 			if(gpio_get(ENCODE_B)==0){ //Clockwise
 				printf("VOLUME UP\n");
 				volume_offset++;
-				//keyboard_global->volume+=volume_offset;
+				if (keyboard_global->volume+volume_offset > 127){
+					keyboard_global->volume=127; //Set to max if over 127
+				}else{
+					keyboard_global->volume+=volume_offset;
+				}
+				
 			}
 			else{ //Otherwise, Counter
 				printf("VOLUME DOWN\n");
 				volume_offset++;
-				//keyboard_global->volume-=volume_offset;
+				if (volume_offset > keyboard_global->volume){
+					keyboard_global->volume=0; //Set to 0 if negative
+				}else{
+					keyboard_global->volume-=volume_offset;
+				}
 			}
 			printf("Volume offset:%d\n", volume_offset);
 			//change_midi_volume(0,keyboard_global->volume);//This can move to the main function I think
