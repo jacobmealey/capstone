@@ -48,20 +48,25 @@ uint8_t pin_init()
 	gpio_set_dir(OCT_UP, GPIO_IN);
 
 	gpio_init(ENCODE_PRESS);
+	gpio_set_pulls(ENCODE_PRESS,true,false);
 	gpio_set_dir(ENCODE_PRESS, GPIO_IN);
 
 	gpio_init(ENCODE_A);
+	gpio_set_slew_rate(ENCODE_A,GPIO_SLEW_RATE_FAST);
+	gpio_set_pulls(ENCODE_A,true,false);
 	gpio_set_dir(ENCODE_A, GPIO_IN);
 
 	gpio_init(ENCODE_B);
+	gpio_set_slew_rate(ENCODE_B,GPIO_SLEW_RATE_FAST);
+	gpio_set_pulls(ENCODE_B,true,false);
 	gpio_set_dir(ENCODE_B, GPIO_IN);
+
 
 	// GPIO Interrupt Setup
 	gpio_set_irq_enabled_with_callback(ENCODE_PRESS, GPIO_IRQ_EDGE_FALL, true, &gpio_callback);
 	gpio_set_irq_enabled(OCT_DOWN,GPIO_IRQ_EDGE_FALL,true);
 	gpio_set_irq_enabled(OCT_UP,GPIO_IRQ_EDGE_FALL,true);
 	gpio_set_irq_enabled(ENCODE_A, GPIO_IRQ_EDGE_FALL, true);
-	//gpio_set_irq_enabled(ENCODE_B, GPIO_IRQ_EDGE_RISE, true);
 	return 0;
 }
 
@@ -95,13 +100,15 @@ void gpio_event_string(char *buf, uint32_t events) {
 
 void gpio_callback(uint gpio, uint32_t events)
 {
+	int status = save_and_disable_interrupts();
 	char event_str[128];
 	int volume_offset;
-	gpio_event_string(event_str, events);
-	printf("GPIO IRQ CALLBACK\n GPIO Num %d\n, Event %s\n", gpio, event_str);
+	//gpio_event_string(event_str, events);
+	//printf("GPIO IRQ CALLBACK\n GPIO Num %d\n, Event %s\n", gpio, event_str);
 	
 	switch(gpio){
 		case ENCODE_PRESS:
+			printf("Mute\n");
 			mute_midi_volume(keyboard_global->channel);
 			break;
 		case OCT_DOWN:
@@ -127,8 +134,7 @@ void gpio_callback(uint gpio, uint32_t events)
 					keyboard_global->volume+=volume_offset;
 				}
 				
-			}
-			else{ //Otherwise, Counter
+			}else{ //Otherwise, Counter
 				printf("VOLUME DOWN\n");
 				volume_offset++;
 				if (volume_offset > keyboard_global->volume){
@@ -142,4 +148,6 @@ void gpio_callback(uint gpio, uint32_t events)
 			break;
 	}
 	gpio_put(PICO_DEFAULT_LED_PIN, 0);
+	busy_wait_ms(50);
+	restore_interrupts(status);
 }

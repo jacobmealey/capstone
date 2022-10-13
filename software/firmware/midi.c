@@ -38,6 +38,7 @@ uint8_t change_midi_volume(uint8_t channel_num, uint8_t volume){
 uint8_t mute_midi_volume(uint8_t channel_num){
 	uint8_t message[3] = {CONTROL_CHANGE | channel_num, MUTE_CONTROLLER, 0x00};
 	tud_midi_stream_write(0, message, 3);
+	return 0;
 }
 
 
