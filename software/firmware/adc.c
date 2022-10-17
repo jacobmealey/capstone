@@ -64,7 +64,7 @@ void adc_read_irq(void) {
 
     //printf("Current: %d, Prev: %d\n",keyboard_global->keys[current_channel].current_pos,
     //                                keyboard_global->keys[current_channel].prev_pos);
-    
+    uint8_t note = current_channel + (keyboard_global->octave * 12); //Determine note
     if (current_value < KEY_THRESH && 
             keyboard_global->keys[current_channel].pressed == 0 &&
             keyboard_global->keys[current_channel].prev_pos > keyboard_global->keys[current_channel].current_pos)
@@ -75,13 +75,13 @@ void adc_read_irq(void) {
             (127 - keyboard_global->keys[ADC_PRV_CHAN(adc_global->channel_val)].current_pos);
         
 
-        if (send_general_midi_message(NOTE_ON,0,90,velocity ,0)){
+        if (send_general_midi_message(NOTE_ON,0,note,velocity ,0)){
         //printf("MIDI NOTE ON SEND ERROR\n");
         }
     }
     if (keyboard_global->keys[current_channel].pressed == 1 && current_value > KEY_THRESH){
         keyboard_global->keys[current_channel].pressed = 0;
-        if (send_general_midi_message(NOTE_OFF,0,90,0 ,0)){
+        if (send_general_midi_message(NOTE_OFF,0,note,0 ,0)){
         //printf("MIDI NOTE OFF SEND ERROR\n");
         }
     }

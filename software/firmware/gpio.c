@@ -113,15 +113,20 @@ void gpio_callback(uint gpio, uint32_t events)
 			break;
 		case OCT_DOWN:
 			//Lower octave on keyboard struct
+			if (keyboard_global->octave <= 2){//Don't allow users to go below octave 2
+				break;
+			}
 			keyboard_global->octave--;
 			printf("Keyboard Octave: %d\n",keyboard_global->octave);
 
 			break;
 		case OCT_UP:
 			//Increase octave on keyboard struct
+			if (keyboard_global->octave >= 8){//Don't allow users to go above octave 8 
+				break;
+			}
 			printf("Keyboard Octave: %d\n",keyboard_global->octave);
 			keyboard_global->octave++;
-			printf("Keyboard Octave: %d\n",keyboard_global->octave);
 			break;
 		case ENCODE_A:
 			volume_offset = 0;
