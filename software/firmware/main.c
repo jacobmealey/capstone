@@ -39,10 +39,12 @@
 #include "hardware/spi.h"
 #include "hardware/gpio.h"
 #include "pico/stdio.h"
+#include "pico/multicore.h"
 
 #define DISP_SIZE 30720
 
 void midi_task(struct adc_t *adc);
+void core1_main();
 
 struct adc_t *adc_global;
 struct keyboard *keyboard_global;
@@ -53,7 +55,6 @@ int main(void) {
  
     stdio_init_all();
     uart_init(uart0, 9600);
-    struct disp_t disp;
     
     //Initialize GPIO pins
     pin_init();
@@ -70,6 +71,20 @@ int main(void) {
     //tusb_init();
     printf("USB initialized\n");
 
+    multicore_launch_core1(core1_main);
+
+    while (1) {
+        //tud_task(); // tinyusb device tast
+        //midi_task(adc_global);
+        sleep_ms(100);
+    }
+
+
+    return 0;
+}
+
+void core1_main() {
+    struct disp_t disp;
     printf("initializing display");
     init_disp(&disp, spi0, TFT_DC);
     printf("Entering main loop\n");
@@ -93,16 +108,11 @@ int main(void) {
     draw_rect(10, 10, 30, 54, ORANGE);
     draw_rect(100, 56, 15, 12, PURPLE);
 
-    while (1) {
+    while(1) {
         // draw_font_test();
         draw_string("Velocity: 2.5cm/s", 45, 125, PINK, BLUE);
-        //tud_task(); // tinyusb device tast
-        //midi_task(adc_global);
-        sleep_ms(100);
     }
 
-
-    return 0;
 }
 
 
