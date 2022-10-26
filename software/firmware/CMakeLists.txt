@@ -36,6 +36,7 @@ target_include_directories(midi_firmware PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 target_link_libraries(midi_firmware PUBLIC 
       pico_stdlib 
+      pico_multicore 
       tinyusb_device 
       tinyusb_board 
       hardware_spi 

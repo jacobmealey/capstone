@@ -13,16 +13,22 @@
 #include "pins.h"
 #include "midi.h"
 #include "keys.h"
+#include "display.h"
 
 #include "hardware/spi.h"
 #include "hardware/gpio.h"
 #include "pico/stdio.h"
+#include "pico/multicore.h"
 
+#define DISP_SIZE 30720
 int keyboard_task();
+
 void midi_task(struct adc_t *adc);
+void core1_main();
 
 struct adc_t *adc_global;
 struct keyboard *keyboard_global;
+struct disp_t *disp_global;
 
 /*------------- MAIN -------------*/
 int main(void) {
@@ -40,12 +46,12 @@ int main(void) {
     //Initialize Keyboard
     keyboard_global = init_keys();   
 
+
     //Initialize USB
-    tusb_init();
+    //tusb_init();
     printf("USB initialized\n");
 
-   
-    printf("Entering main loop\n");
+    multicore_launch_core1(core1_main);
 
     while (1) {
         tud_task(); // tinyusb device task
@@ -55,6 +61,38 @@ int main(void) {
 
 
     return 0;
+}
+
+void core1_main() {
+    struct disp_t disp;
+    printf("initializing display");
+    init_disp(&disp, spi0, TFT_DC);
+    printf("Entering main loop\n");
+
+    uint8_t buffer[DISP_SIZE];
+    int screen_size = 128*160;
+    uint16_t *screen = malloc(screen_size * sizeof(uint16_t));
+    if (screen == NULL) {
+        printf("SCREEN BASED\n");
+    }
+
+    for(int i = 0; i < screen_size; i++) {
+        screen[i] = 0xFFF;
+    }
+
+    screan_to_disp(screen, buffer, screen_size);
+
+    disp_wr_cmd(&disp, DISP_RAMWR, buffer, DISP_SIZE);
+    disp_wr_cmd(&disp, DISP_NOP, NULL, 0);
+
+    draw_rect(10, 10, 30, 54, ORANGE);
+    draw_rect(100, 56, 15, 12, PURPLE);
+
+    while(1) {
+        // draw_font_test();
+        draw_string("Velocity: 2.5cm/s", 45, 125, PINK, BLUE);
+    }
+
 }
 
 
