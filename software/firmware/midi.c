@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "midi.h"
+#include "keys.h"
 
 uint8_t send_general_midi_message(uint8_t command_num, uint8_t channel_num, uint8_t note_num, uint8_t velocity, uint8_t pressure){
     //printf("Command number: %x\n", command_num);
@@ -26,6 +27,7 @@ uint8_t send_general_midi_message(uint8_t command_num, uint8_t channel_num, uint
 
 uint8_t change_midi_volume(uint8_t channel_num, uint8_t volume){
 	if (volume > 127){//If volume is too large, set it to max level
+		keyboard_global->volume = 127;
 		volume=127;
 	}
 	uint8_t message[3] = {CONTROL_CHANGE|channel_num, VOLUME_CONTROLLER, volume};
@@ -36,6 +38,7 @@ uint8_t change_midi_volume(uint8_t channel_num, uint8_t volume){
 uint8_t mute_midi_volume(uint8_t channel_num){
 	uint8_t message[3] = {CONTROL_CHANGE | channel_num, MUTE_CONTROLLER, 0x00};
 	tud_midi_stream_write(0, message, 3);
+	return 0;
 }
 
 

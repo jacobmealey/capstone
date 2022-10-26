@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include "keys.h"
 #include "midi.h"
+#include "pico/sync.h"
 
 uint8_t pin_init()
 {
@@ -47,13 +48,25 @@ uint8_t pin_init()
 	gpio_set_dir(OCT_UP, GPIO_IN);
 
 	gpio_init(ENCODE_PRESS);
+	gpio_set_pulls(ENCODE_PRESS,true,false);
 	gpio_set_dir(ENCODE_PRESS, GPIO_IN);
+
+	gpio_init(ENCODE_A);
+	gpio_set_slew_rate(ENCODE_A,GPIO_SLEW_RATE_FAST);
+	gpio_set_pulls(ENCODE_A,true,false);
+	gpio_set_dir(ENCODE_A, GPIO_IN);
+
+	gpio_init(ENCODE_B);
+	gpio_set_slew_rate(ENCODE_B,GPIO_SLEW_RATE_FAST);
+	gpio_set_pulls(ENCODE_B,true,false);
+	gpio_set_dir(ENCODE_B, GPIO_IN);
+
 
 	// GPIO Interrupt Setup
 	gpio_set_irq_enabled_with_callback(ENCODE_PRESS, GPIO_IRQ_EDGE_FALL, true, &gpio_callback);
 	gpio_set_irq_enabled(OCT_DOWN,GPIO_IRQ_EDGE_FALL,true);
 	gpio_set_irq_enabled(OCT_UP,GPIO_IRQ_EDGE_FALL,true);
-
+	gpio_set_irq_enabled(ENCODE_A, GPIO_IRQ_EDGE_FALL, true);
 	return 0;
 }
 
@@ -87,28 +100,61 @@ void gpio_event_string(char *buf, uint32_t events) {
 
 void gpio_callback(uint gpio, uint32_t events)
 {
+	int status = save_and_disable_interrupts();
 	char event_str[128];
-	gpio_event_string(event_str, events);
-	printf("GPIO IRQ CALLBACK\n GPIO Num %d\n, Event %s\n", gpio, event_str);
+	int volume_offset;
+	//gpio_event_string(event_str, events);
+	//printf("GPIO IRQ CALLBACK\n GPIO Num %d\n, Event %s\n", gpio, event_str);
 	
 	switch(gpio){
 		case ENCODE_PRESS:
+			printf("Mute\n");
 			mute_midi_volume(keyboard_global->channel);
 			break;
 		case OCT_DOWN:
 			//Lower octave on keyboard struct
+			if (keyboard_global->octave <= 2){//Don't allow users to go below octave 2
+				break;
+			}
 			keyboard_global->octave--;
 			printf("Keyboard Octave: %d\n",keyboard_global->octave);
 
 			break;
 		case OCT_UP:
 			//Increase octave on keyboard struct
+			if (keyboard_global->octave >= 8){//Don't allow users to go above octave 8 
+				break;
+			}
 			printf("Keyboard Octave: %d\n",keyboard_global->octave);
 			keyboard_global->octave++;
-			printf("Keyboard Octave: %d\n",keyboard_global->octave);
-
+			break;
+		case ENCODE_A:
+			volume_offset = 0;
+			if(gpio_get(ENCODE_B)==0){ //Clockwise
+				printf("VOLUME UP\n");
+				volume_offset++;
+				if (keyboard_global->volume+volume_offset > 127){
+					keyboard_global->volume=127; //Set to max if over 127
+				}else{
+					keyboard_global->volume+=volume_offset;
+				}
+				
+			}else{ //Otherwise, Counter
+				printf("VOLUME DOWN\n");
+				volume_offset++;
+				if (volume_offset > keyboard_global->volume){
+					keyboard_global->volume=0; //Set to 0 if negative
+				}else{
+					keyboard_global->volume-=volume_offset;
+				}
+			}
+			printf("Volume offset:%d\n", volume_offset);
+			//change_midi_volume(0,keyboard_global->volume);//This can move to the main function I think
 			break;
 	}
-
 	gpio_put(PICO_DEFAULT_LED_PIN, 0);
+
+	busy_wait_ms(50);
+	restore_interrupts(status);
 }
+

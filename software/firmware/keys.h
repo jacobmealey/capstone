@@ -11,7 +11,7 @@
 // The amount of difference between key.current_pos
 // and key.prev_pos to be considered "pressed" this
 // will most likely need to be tuned later.
-#define KEY_THRESH 0x0500
+#define KEY_THRESH 0x50
 #define KEY_UPPER 95U
 #define KEY_LOWER 3U
 
@@ -19,7 +19,8 @@ typedef struct key
 {
     uint8_t current_pos; // current position of the key
     uint8_t prev_pos;    // previous position of the key
-    uint8_t pressed;     // Flag showing whether or not the key is currently pressed
+    uint8_t pressed;     // Flag showing whether or not the key has been pressed.
+    uint8_t active;      // Flag showing whether or not the key is active.
 } key;
 
 typedef struct keyboard
