@@ -15,7 +15,7 @@ struct adc_t *init_adc(spi_inst_t *spi, uint16_t spi_cs) {
     struct adc_t *adc = malloc(sizeof(struct adc_t));
 
     adc->spi = spi;
-    spi_init(adc->spi, 200000);
+    spi_init(adc->spi, 100000);
     spi_set_format(adc->spi, 16, 0, 0, SPI_MSB_FIRST);
     adc->spi_cs = spi_cs;
     adc->control_reg = ADC_MODE_RESET;  
@@ -36,7 +36,7 @@ struct adc_t *init_adc(spi_inst_t *spi, uint16_t spi_cs) {
     // Configure timer for SPI writes
     // timer must be allocated in heap so it lives beyond lifetime of init_adc
     repeating_timer_t *timer = malloc(sizeof(repeating_timer_t));
-    if(add_repeating_timer_ms(-60, adc_write_callback, NULL, timer)) {
+    if(add_repeating_timer_ms(-100, adc_write_callback, NULL, timer)) {
         gpio_put(PICO_DEFAULT_LED_PIN, 1);
     }
 
@@ -57,33 +57,19 @@ bool adc_write_callback(struct repeating_timer *t) {
 // Callback function called after each ADC read
 void adc_read_irq(void) {
     adc_global->channel_val = spi_get_hw(adc_global->spi)->dr; //Set channel value
-    uint8_t current_channel = ADC_PRV_CHAN(adc_global->channel_val);
+    uint8_t current_channel = ADC_PRV_CHAN(adc_global->channel_val); 
     uint8_t current_value = ADC_8BIT_VAL(adc_global->channel_val);
     printf("0x%04x 0x%04x\n", adc_global->control_reg, adc_global->channel_val); //Print value
     keyboard_global->keys[current_channel].current_pos = current_value; //Update keys struct
 
-    //printf("Current: %d, Prev: %d\n",keyboard_global->keys[current_channel].current_pos,
-    //                                keyboard_global->keys[current_channel].prev_pos);
-    uint8_t note = current_channel + (keyboard_global->octave * 12); //Determine note
     if (current_value < KEY_THRESH && 
             keyboard_global->keys[current_channel].pressed == 0 &&
             keyboard_global->keys[current_channel].prev_pos > keyboard_global->keys[current_channel].current_pos)
         {
         keyboard_global->keys[current_channel].pressed = 1;
-
-        uint8_t velocity = 
-            (127 - keyboard_global->keys[ADC_PRV_CHAN(adc_global->channel_val)].current_pos);
-        
-
-        if (send_general_midi_message(NOTE_ON,0,note,velocity ,0)){
-        //printf("MIDI NOTE ON SEND ERROR\n");
-        }
     }
     if (keyboard_global->keys[current_channel].pressed == 1 && current_value > KEY_THRESH){
         keyboard_global->keys[current_channel].pressed = 0;
-        if (send_general_midi_message(NOTE_OFF,0,note,0 ,0)){
-        //printf("MIDI NOTE OFF SEND ERROR\n");
-        }
     }
 
     keyboard_global->keys[ADC_PRV_CHAN(adc_global->channel_val)].prev_pos = keyboard_global->keys[ADC_PRV_CHAN(adc_global->channel_val)].current_pos;

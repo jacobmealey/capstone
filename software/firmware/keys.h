@@ -19,7 +19,8 @@ typedef struct key
 {
     uint8_t current_pos; // current position of the key
     uint8_t prev_pos;    // previous position of the key
-    uint8_t pressed;     // Flag showing whether or not the key is currently pressed
+    uint8_t pressed;     // Flag showing whether or not the key has been pressed.
+    uint8_t active;      // Flag showing whether or not the key is active.
 } key;
 
 typedef struct keyboard
