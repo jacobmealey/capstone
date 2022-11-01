@@ -30,7 +30,7 @@ uint8_t pin_init()
 	gpio_set_function(SPI0_SCLK, GPIO_FUNC_SPI);
 	gpio_set_function(SPI0_RX, GPIO_FUNC_SPI);
 	gpio_set_function(SPI0_TX, GPIO_FUNC_SPI);
-	gpio_set_function(SPI0_CS, GPIO_FUNC_SPI);
+	//gpio_set_function(SPI0_CS, GPIO_FUNC_SPI);
 	printf("alternate functions for Display set\n");
 
 	// LED pin defs
@@ -153,6 +153,8 @@ void gpio_callback(uint gpio, uint32_t events)
 			break;
 	}
 	gpio_put(PICO_DEFAULT_LED_PIN, 0);
+
 	busy_wait_ms(50);
 	restore_interrupts(status);
 }
+
