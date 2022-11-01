@@ -48,7 +48,7 @@ int main(void) {
 
 
     //Initialize USB
-    //tusb_init();
+    tusb_init();
     printf("USB initialized\n");
 
     multicore_launch_core1(core1_main);
