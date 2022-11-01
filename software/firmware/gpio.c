@@ -38,8 +38,6 @@ uint8_t pin_init()
 	gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
 
 	// Button Initialization
-	gpio_init(RESET);
-	gpio_set_dir(RESET, GPIO_IN);
 
 	gpio_init(OCT_DOWN);
 	gpio_set_dir(OCT_DOWN, GPIO_IN);
