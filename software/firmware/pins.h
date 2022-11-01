@@ -46,7 +46,6 @@
 #define I2C0_SCL        21
 
 //User Control Buttons
-#define RESET           22
 #define OCT_UP          23
 #define OCT_DOWN        24
 
