@@ -44,14 +44,16 @@ int main(void) {
     printf("ADC initialized\n");
 
     //Initialize Keyboard
-    keyboard_global = init_keys();   
-
+    keyboard_global = init_keys();
+    printf("Keyboard Initialized"); 
 
     //Initialize USB
     tusb_init();
     printf("USB initialized\n");
 
     multicore_launch_core1(core1_main);
+
+    gpio_put(LED_0,1);
 
     while (1) {
         tud_task(); // tinyusb device task
@@ -142,7 +144,6 @@ void midi_task(struct adc_t *adc) {
     static uint32_t start_ms = 0;
 
     //uint8_t const cable_num = 0; // MIDI jack associated with USB endpoint
-    uint8_t const channel   = 0; // 0 for channel 1
     // GET most recently read key 
     if(adc == NULL) return;
 
