@@ -11,11 +11,6 @@ double key_get_velocity_cms(key *k) {
     return 0.;
 }
 
-int generate_midi_output(struct keyboard *ks, uint8_t *midi_buffer) {
-    // TODO
-    return 0;
-}
-
 struct keyboard *init_keys(){
     struct keyboard *keyb = malloc(sizeof(struct keyboard));
 
@@ -26,6 +21,7 @@ struct keyboard *init_keys(){
         keyb->keys[i].current_pos = 0x5C;
         keyb->keys[i].prev_pos = 0x5C;
         keyb->keys[i].pressed = 0;
+        keyb->keys[i].active = 0;
     }
     return keyb;
 }

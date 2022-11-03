@@ -108,13 +108,12 @@ void core1_main() {
 
 int keyboard_task(){
     static int i = 0;
-    key current_key = keyboard_global->keys[i];
 
     uint8_t note = i + (keyboard_global->octave * 12);
 
-    if (current_key.pressed == 1 && current_key.active == 0){ //Falling edge
-        current_key.active = 0;
-        uint8_t velocity = (127 - current_key.current_pos);
+    if (keyboard_global->keys[i].pressed == 1 && keyboard_global->keys[i].active == 0){ //Falling edge
+        keyboard_global->keys[i].active = 1;
+        uint8_t velocity = (127 - (keyboard_global->keys[i].current_pos*2));
         if(send_general_midi_message(NOTE_ON, keyboard_global->channel, note,velocity,0)){
             printf("MIDI NOTE ON FAIL\n");
             i++;
@@ -123,8 +122,8 @@ int keyboard_task(){
             }
             return 1;
         }
-    } else if(current_key.active == 1 && current_key.pressed == 0){
-        current_key.active = 0;
+    } else if(keyboard_global->keys[i].active == 1 && keyboard_global->keys[i].pressed == 0){
+        keyboard_global->keys[i].active = 0;
         if (send_general_midi_message(NOTE_OFF, keyboard_global->channel, note,0,0)){
             printf("MIDI NOTE OFF FAIL\n");
             i++;
