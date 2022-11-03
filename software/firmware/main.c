@@ -62,15 +62,6 @@ int main(void) {
     multicore_launch_core1(core1_main);
     gpio_put(LED_3,0);
 
-    gpio_put(LED_0,1);
-    gpio_put(LED_1,1);
-    gpio_put(LED_2,1);
-    gpio_put(LED_3,1);
-    sleep_ms(500);
-    gpio_put(LED_1,0);
-    gpio_put(LED_2,0);
-    gpio_put(LED_3,0);
-
 
     while (1) {
         tud_task(); // tinyusb device task
