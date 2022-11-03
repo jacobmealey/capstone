@@ -40,20 +40,37 @@ int main(void) {
     pin_init();
 
     //Initialize ADC
+    gpio_put(LED_0,1);
     adc_global = init_adc(spi1, SPI1_CS);
+    gpio_put(LED_0,0);
     printf("ADC initialized\n");
 
+
     //Initialize Keyboard
+    gpio_put(LED_1,1);
     keyboard_global = init_keys();
+    gpio_put(LED_1,0);
     printf("Keyboard Initialized"); 
 
     //Initialize USB
+    gpio_put(LED_2,1);
     tusb_init();
+    gpio_put(LED_2,0);
     printf("USB initialized\n");
 
+    gpio_put(LED_3,1);
     multicore_launch_core1(core1_main);
+    gpio_put(LED_3,0);
 
     gpio_put(LED_0,1);
+    gpio_put(LED_1,1);
+    gpio_put(LED_2,1);
+    gpio_put(LED_3,1);
+    sleep_ms(500);
+    gpio_put(LED_1,0);
+    gpio_put(LED_2,0);
+    gpio_put(LED_3,0);
+
 
     while (1) {
         tud_task(); // tinyusb device task
