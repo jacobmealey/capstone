@@ -40,18 +40,28 @@ int main(void) {
     pin_init();
 
     //Initialize ADC
+    gpio_put(LED_0,1);
     adc_global = init_adc(spi1, SPI1_CS);
+    gpio_put(LED_0,0);
     printf("ADC initialized\n");
 
-    //Initialize Keyboard
-    keyboard_global = init_keys();   
 
+    //Initialize Keyboard
+    gpio_put(LED_1,1);
+    keyboard_global = init_keys();
+    gpio_put(LED_1,0);
+    printf("Keyboard Initialized"); 
 
     //Initialize USB
-    //tusb_init();
+    gpio_put(LED_2,1);
+    tusb_init();
+    gpio_put(LED_2,0);
     printf("USB initialized\n");
 
+    gpio_put(LED_3,1);
     multicore_launch_core1(core1_main);
+    gpio_put(LED_3,0);
+
 
     while (1) {
         tud_task(); // tinyusb device task
@@ -98,13 +108,12 @@ void core1_main() {
 
 int keyboard_task(){
     static int i = 0;
-    key current_key = keyboard_global->keys[i];
 
     uint8_t note = i + (keyboard_global->octave * 12);
 
-    if (current_key.pressed == 1 && current_key.active == 0){ //Falling edge
-        current_key.active = 0;
-        uint8_t velocity = (127 - current_key.current_pos);
+    if (keyboard_global->keys[i].pressed == 1 && keyboard_global->keys[i].active == 0){ //Falling edge
+        keyboard_global->keys[i].active = 1;
+        uint8_t velocity = (127 - (keyboard_global->keys[i].current_pos*2));
         if(send_general_midi_message(NOTE_ON, keyboard_global->channel, note,velocity,0)){
             printf("MIDI NOTE ON FAIL\n");
             i++;
@@ -113,8 +122,8 @@ int keyboard_task(){
             }
             return 1;
         }
-    } else if(current_key.active == 1 && current_key.pressed == 0){
-        current_key.active = 0;
+    } else if(keyboard_global->keys[i].active == 1 && keyboard_global->keys[i].pressed == 0){
+        keyboard_global->keys[i].active = 0;
         if (send_general_midi_message(NOTE_OFF, keyboard_global->channel, note,0,0)){
             printf("MIDI NOTE OFF FAIL\n");
             i++;
@@ -142,7 +151,6 @@ void midi_task(struct adc_t *adc) {
     static uint32_t start_ms = 0;
 
     //uint8_t const cable_num = 0; // MIDI jack associated with USB endpoint
-    uint8_t const channel   = 0; // 0 for channel 1
     // GET most recently read key 
     if(adc == NULL) return;
 

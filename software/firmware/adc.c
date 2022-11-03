@@ -37,7 +37,7 @@ struct adc_t *init_adc(spi_inst_t *spi, uint16_t spi_cs) {
     // timer must be allocated in heap so it lives beyond lifetime of init_adc
     repeating_timer_t *timer = malloc(sizeof(repeating_timer_t));
     if(add_repeating_timer_ms(-100, adc_write_callback, NULL, timer)) {
-        gpio_put(PICO_DEFAULT_LED_PIN, 1);
+        gpio_put(LED_0, 1);
     }
 
     // configure interrupt for spi reads
@@ -57,19 +57,27 @@ bool adc_write_callback(struct repeating_timer *t) {
 // Callback function called after each ADC read
 void adc_read_irq(void) {
     adc_global->channel_val = spi_get_hw(adc_global->spi)->dr; //Set channel value
-    uint8_t current_channel = ADC_PRV_CHAN(adc_global->channel_val); 
+
+    adc_global->prev_chanel = ADC_PRV_CHAN(adc_global->channel_val);
     uint8_t current_value = ADC_8BIT_VAL(adc_global->channel_val);
-    printf("0x%04x 0x%04x\n", adc_global->control_reg, adc_global->channel_val); //Print value
-    keyboard_global->keys[current_channel].current_pos = current_value; //Update keys struct
+
+    printf("0x%04x Channel:%d\tValue:%d\n", adc_global->control_reg, adc_global->prev_chanel, current_value); //Print value (clean)
+    //printf("0x%04x 0x%04x\n", adc_global->control_reg, adc_global->channel_val); //Print Value (Raw)
+    
+    keyboard_global->keys[adc_global->prev_chanel].current_pos = current_value; //Update keys struct
 
     if (current_value < KEY_THRESH && 
-            keyboard_global->keys[current_channel].pressed == 0 &&
-            keyboard_global->keys[current_channel].prev_pos > keyboard_global->keys[current_channel].current_pos)
-        {
-        keyboard_global->keys[current_channel].pressed = 1;
+            keyboard_global->keys[adc_global->prev_chanel].pressed == 0 &&
+            keyboard_global->keys[adc_global->prev_chanel].prev_pos > keyboard_global->keys[adc_global->prev_chanel].current_pos)
+    {
+        printf("KEY PRESSED\n");
+        keyboard_global->keys[adc_global->prev_chanel].pressed = 1;
+        
     }
-    if (keyboard_global->keys[current_channel].pressed == 1 && current_value > KEY_THRESH){
-        keyboard_global->keys[current_channel].pressed = 0;
+    
+    if (keyboard_global->keys[adc_global->prev_chanel].pressed == 1 && current_value > KEY_THRESH){
+        printf("KEY RELEASED\n");
+        keyboard_global->keys[adc_global->prev_chanel].pressed = 0;
     }
 
     keyboard_global->keys[ADC_PRV_CHAN(adc_global->channel_val)].prev_pos = keyboard_global->keys[ADC_PRV_CHAN(adc_global->channel_val)].current_pos;

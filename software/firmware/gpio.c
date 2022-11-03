@@ -34,12 +34,19 @@ uint8_t pin_init()
 	printf("alternate functions for Display set\n");
 
 	// LED pin defs
-	gpio_init(PICO_DEFAULT_LED_PIN);
-	gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
+	gpio_init(LED_0);
+	gpio_set_dir(LED_0, GPIO_OUT);
+
+	gpio_init(LED_1);
+	gpio_set_dir(LED_1, GPIO_OUT);
+
+	gpio_init(LED_2);
+	gpio_set_dir(LED_2, GPIO_OUT);
+
+	gpio_init(LED_3);
+	gpio_set_dir(LED_3, GPIO_OUT);
 
 	// Button Initialization
-	gpio_init(RESET);
-	gpio_set_dir(RESET, GPIO_IN);
 
 	gpio_init(OCT_DOWN);
 	gpio_set_dir(OCT_DOWN, GPIO_IN);
@@ -103,8 +110,8 @@ void gpio_callback(uint gpio, uint32_t events)
 	int status = save_and_disable_interrupts();
 	char event_str[128];
 	int volume_offset;
-	//gpio_event_string(event_str, events);
-	//printf("GPIO IRQ CALLBACK\n GPIO Num %d\n, Event %s\n", gpio, event_str);
+	gpio_event_string(event_str, events);
+	printf("GPIO IRQ CALLBACK\n GPIO Num %d\n, Event %s\n", gpio, event_str);
 	
 	switch(gpio){
 		case ENCODE_PRESS:
@@ -114,6 +121,7 @@ void gpio_callback(uint gpio, uint32_t events)
 		case OCT_DOWN:
 			//Lower octave on keyboard struct
 			if (keyboard_global->octave <= 2){//Don't allow users to go below octave 2
+				printf("Keyboard Octave: %d\n",keyboard_global->octave);
 				break;
 			}
 			keyboard_global->octave--;
@@ -122,7 +130,8 @@ void gpio_callback(uint gpio, uint32_t events)
 			break;
 		case OCT_UP:
 			//Increase octave on keyboard struct
-			if (keyboard_global->octave >= 8){//Don't allow users to go above octave 8 
+			if (keyboard_global->octave >= 8){//Don't allow users to go above octave 8
+				printf("Keyboard Octave: %d\n",keyboard_global->octave);
 				break;
 			}
 			printf("Keyboard Octave: %d\n",keyboard_global->octave);
@@ -131,6 +140,16 @@ void gpio_callback(uint gpio, uint32_t events)
 		case ENCODE_A:
 			volume_offset = 0;
 			if(gpio_get(ENCODE_B)==0){ //Clockwise
+				printf("VOLUME DOWN\n");
+				volume_offset++;
+				if (volume_offset > keyboard_global->volume){
+					keyboard_global->volume=0; //Set to 0 if negative
+				}else{
+					keyboard_global->volume-=volume_offset;
+				}	
+			}else{ //Otherwise, Counter
+				
+
 				printf("VOLUME UP\n");
 				volume_offset++;
 				if (keyboard_global->volume+volume_offset > 127){
@@ -138,21 +157,11 @@ void gpio_callback(uint gpio, uint32_t events)
 				}else{
 					keyboard_global->volume+=volume_offset;
 				}
-				
-			}else{ //Otherwise, Counter
-				printf("VOLUME DOWN\n");
-				volume_offset++;
-				if (volume_offset > keyboard_global->volume){
-					keyboard_global->volume=0; //Set to 0 if negative
-				}else{
-					keyboard_global->volume-=volume_offset;
-				}
 			}
 			printf("Volume offset:%d\n", volume_offset);
-			//change_midi_volume(0,keyboard_global->volume);//This can move to the main function I think
+			change_midi_volume(0,keyboard_global->volume);//This can move to the main function I think
 			break;
 	}
-	gpio_put(PICO_DEFAULT_LED_PIN, 0);
 
 	busy_wait_ms(50);
 	restore_interrupts(status);
