@@ -94,14 +94,20 @@ void core1_main() {
 
     disp_wr_cmd(&disp, DISP_RAMWR, buffer, DISP_SIZE);
     disp_wr_cmd(&disp, DISP_NOP, NULL, 0);
+    
+    
 
     draw_rect(10, 10, 30, 54, ORANGE);
     draw_rect(100, 56, 15, 12, PURPLE);
 
+
+
+    
     while(1) {
-        // draw_font_test();
+        //draw_font_test();
         draw_string("Velocity: 2.5cm/s", 45, 125, PINK, BLUE);
     }
+    
 
 }
 
