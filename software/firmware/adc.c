@@ -31,7 +31,7 @@ struct adc_t *init_adc(spi_inst_t *spi, uint16_t spi_cs) {
     adc_write_read_blocking(adc);
     printf("0x%04x 0x%04x\n", adc->control_reg, adc->channel_val);
     // set control register to continue in auto mode-2
-    adc->control_reg = ADC_MODE_RESET;
+    adc->control_reg = ADC_MODE_RESET | (2 << 7);
 
     // Configure timer for SPI writes
     // timer must be allocated in heap so it lives beyond lifetime of init_adc
@@ -64,6 +64,7 @@ void adc_read_irq(void) {
     printf("0x%04x Channel:%d\tValue:%d\n", adc_global->control_reg, adc_global->prev_chanel, current_value); //Print value (clean)
     //printf("0x%04x 0x%04x\n", adc_global->control_reg, adc_global->channel_val); //Print Value (Raw)
     
+    keyboard_global->keys[adc_global->prev_chanel].prev_pos = keyboard_global->keys[adc_global->prev_chanel].current_pos ; //Update keys struct
     keyboard_global->keys[adc_global->prev_chanel].current_pos = current_value; //Update keys struct
 
     if (current_value < KEY_THRESH && 
@@ -80,7 +81,7 @@ void adc_read_irq(void) {
         keyboard_global->keys[adc_global->prev_chanel].pressed = 0;
     }
 
-    keyboard_global->keys[ADC_PRV_CHAN(adc_global->channel_val)].prev_pos = keyboard_global->keys[ADC_PRV_CHAN(adc_global->channel_val)].current_pos;
+    //keyboard_global->keys[ADC_PRV_CHAN(adc_global->channel_val)].prev_pos = keyboard_global->keys[ADC_PRV_CHAN(adc_global->channel_val)].current_pos;
 
     spi_get_hw(adc_global->spi)->icr = 0;//Reset SPI Interrupt Control Register
 }

@@ -69,6 +69,9 @@ uint8_t pin_init()
 	gpio_set_dir(ENCODE_B, GPIO_IN);
 
 
+    gpio_init(PICO_DEFAULT_LED_PIN);
+    gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
+
 	// GPIO Interrupt Setup
 	gpio_set_irq_enabled_with_callback(ENCODE_PRESS, GPIO_IRQ_EDGE_FALL, true, &gpio_callback);
 	gpio_set_irq_enabled(OCT_DOWN,GPIO_IRQ_EDGE_FALL,true);

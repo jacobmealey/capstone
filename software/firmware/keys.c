@@ -1,5 +1,7 @@
 #include "keys.h"
 #include "stdlib.h"
+#include "pico/stdlib.h"
+#include "hardware/gpio.h"
 
 uint8_t key_get_velocity(key *k) {
     // TODO
@@ -7,8 +9,14 @@ uint8_t key_get_velocity(key *k) {
     return 0;
 }
 double key_get_velocity_cms(key *k) {
-    // TODO 
-    return 0.;
+    static float cm_per_step = 0.0161;
+    int delta_x = k->prev_pos - k->current_pos;
+    if(delta_x == 0){
+        gpio_put(PICO_DEFAULT_LED_PIN, 1);
+    }else {
+        gpio_put(PICO_DEFAULT_LED_PIN, 0);
+    }
+    return (delta_x * cm_per_step)/0.005;
 }
 
 struct keyboard *init_keys(){

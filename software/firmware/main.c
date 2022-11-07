@@ -5,6 +5,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include "bsp/board.h"
 #include "tusb.h"
@@ -19,6 +20,7 @@
 #include "hardware/gpio.h"
 #include "pico/stdio.h"
 #include "pico/multicore.h"
+#include "pico/util/queue.h"
 
 #define DISP_SIZE 30720
 int keyboard_task();
@@ -29,6 +31,11 @@ void core1_main();
 struct adc_t *adc_global;
 struct keyboard *keyboard_global;
 struct disp_t *disp_global;
+
+// A queue for sending the current state of the keyboard
+// to the second core 
+queue_t key_state_q;
+
 
 /*------------- MAIN -------------*/
 int main(void) {
@@ -58,6 +65,9 @@ int main(void) {
     gpio_put(LED_2,0);
     printf("USB initialized\n");
 
+    // Initialize Queue for inter core comms
+    queue_init(&key_state_q, sizeof(struct keyboard), 2);
+
     gpio_put(LED_3,1);
     multicore_launch_core1(core1_main);
     gpio_put(LED_3,0);
@@ -78,6 +88,10 @@ void core1_main() {
     printf("initializing display");
     init_disp(&disp, spi0, TFT_DC);
     printf("Entering main loop\n");
+    // Buffer that will be written to the screen
+    char print_buffer[128];
+
+    double top_velocity = 0;
 
     uint8_t buffer[DISP_SIZE];
     int screen_size = 128*160;
@@ -99,8 +113,30 @@ void core1_main() {
     draw_rect(100, 56, 15, 12, PURPLE);
 
     while(1) {
-        // draw_font_test();
-        draw_string("Velocity: 2.5cm/s", 45, 125, PINK, BLUE);
+        keyboard keystate;
+        if(!queue_try_remove(&key_state_q, &keystate)) {
+            continue; // we couldn't remove so we do nothing else
+        }
+        int active = -1;
+        double vel;
+        // NOTE: THIS DOESN'T GET THE MOST RECENTLY PRESSED BUT THE 
+        // FIRST PRESSED KEY IN THE ARRAY! FIX
+        for(unsigned int i = 0; i < KEY_COUNT && active == -1; i++) {
+            if(keystate.keys[i].active) {
+                active = i;
+            }
+        }
+
+        key active_key  = keystate.keys[2];
+        vel = key_get_velocity_cms(&active_key);
+        if(vel > 0 && vel < 100) {
+            top_velocity = vel;
+            sprintf(print_buffer, "Velocity: %.2f cm/s", top_velocity);
+            draw_string(print_buffer, 45, 125, WHITE, BLACK);
+        }
+        sprintf(print_buffer, "prev: %d curr: %d", active_key.prev_pos, active_key.current_pos);
+        draw_string(print_buffer, 35, 125, WHITE, BLACK);
+
     }
 
 }
@@ -134,6 +170,10 @@ int keyboard_task(){
         }
     }
 
+    // push new state of the global keyboard
+    // note: we are not doing the blocking one because if the 
+    // queue is full we can just skip this as it's not "critical"
+    queue_try_add(&key_state_q, keyboard_global);
 
     i++;
     if (i == KEY_COUNT){
