@@ -108,11 +108,17 @@ void core1_main() {
 
     disp_wr_cmd(&disp, DISP_RAMWR, buffer, DISP_SIZE);
     disp_wr_cmd(&disp, DISP_NOP, NULL, 0);
+    
+    
 
     draw_rect(10, 10, 30, 54, ORANGE);
     draw_rect(100, 56, 15, 12, PURPLE);
 
+
+
+    
     while(1) {
+<<<<<<< HEAD
         keyboard keystate;
         if(!queue_try_remove(&key_state_q, &keystate)) {
             continue; // we couldn't remove so we do nothing else
@@ -137,7 +143,12 @@ void core1_main() {
         sprintf(print_buffer, "prev: %d curr: %d", active_key.prev_pos, active_key.current_pos);
         draw_string(print_buffer, 35, 125, WHITE, BLACK);
 
+=======
+        //draw_font_test();
+        draw_string("Velocity: 2.5cm/s", 45, 125, PINK, BLUE);
+>>>>>>> b841143d51003ce5e1645a2207587f2e992e6493
     }
+    
 
 }
 
