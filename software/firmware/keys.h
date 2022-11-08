@@ -4,6 +4,7 @@
 #define KEYS_H
 
 #include <stdint.h>
+#include "pico/time.h"
 
 // amount of keys in the keyboard
 #define KEY_COUNT 12U
@@ -21,6 +22,11 @@ typedef struct key
     uint8_t prev_pos;    // previous position of the key
     uint8_t pressed;     // Flag showing whether or not the key has been pressed.
     uint8_t active;      // Flag showing whether or not the key is active.
+    absolute_time_t start_time;
+    absolute_time_t end_time;
+    uint8_t start_pos;
+    uint8_t end_pos;    
+
 } key;
 
 typedef struct keyboard

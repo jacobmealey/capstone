@@ -118,7 +118,6 @@ void core1_main() {
 
     
     while(1) {
-<<<<<<< HEAD
         keyboard keystate;
         if(!queue_try_remove(&key_state_q, &keystate)) {
             continue; // we couldn't remove so we do nothing else
@@ -135,18 +134,13 @@ void core1_main() {
 
         key active_key  = keystate.keys[2];
         vel = key_get_velocity_cms(&active_key);
-        if(vel > 0 && vel < 100) {
+        if(vel > 0 && vel < 100 && vel > top_velocity) {
             top_velocity = vel;
             sprintf(print_buffer, "Velocity: %.2f cm/s", top_velocity);
             draw_string(print_buffer, 45, 125, WHITE, BLACK);
         }
         sprintf(print_buffer, "prev: %d curr: %d", active_key.prev_pos, active_key.current_pos);
         draw_string(print_buffer, 35, 125, WHITE, BLACK);
-
-=======
-        //draw_font_test();
-        draw_string("Velocity: 2.5cm/s", 45, 125, PINK, BLUE);
->>>>>>> b841143d51003ce5e1645a2207587f2e992e6493
     }
     
 

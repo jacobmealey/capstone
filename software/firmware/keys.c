@@ -11,10 +11,8 @@ uint8_t key_get_velocity(key *k) {
 double key_get_velocity_cms(key *k) {
     static float cm_per_step = 0.0161;
     int delta_x = k->prev_pos - k->current_pos;
-    if(delta_x == 0){
-        gpio_put(PICO_DEFAULT_LED_PIN, 1);
-    }else {
-        gpio_put(PICO_DEFAULT_LED_PIN, 0);
+    if(delta_x < 3){
+        return 0;
     }
     return (delta_x * cm_per_step)/0.005;
 }

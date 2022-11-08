@@ -31,16 +31,12 @@ struct adc_t *init_adc(spi_inst_t *spi, uint16_t spi_cs) {
     adc_write_read_blocking(adc);
     printf("0x%04x 0x%04x\n", adc->control_reg, adc->channel_val);
     // set control register to continue in auto mode-2
-<<<<<<< HEAD
-    adc->control_reg = ADC_MODE_RESET | (2 << 7);
-=======
     adc->control_reg = ADC_MODE_AUTO2;
->>>>>>> b841143d51003ce5e1645a2207587f2e992e6493
 
     // Configure timer for SPI writes
     // timer must be allocated in heap so it lives beyond lifetime of init_adc
     repeating_timer_t *timer = malloc(sizeof(repeating_timer_t));
-    if(add_repeating_timer_ms(-5, adc_write_callback, NULL, timer)) {
+    if(add_repeating_timer_ms(5, adc_write_callback, NULL, timer)) {
         gpio_put(LED_0, 1);
     }
 
@@ -61,31 +57,30 @@ bool adc_write_callback(struct repeating_timer *t) {
 // Callback function called after each ADC read
 void adc_read_irq(void) {
     adc_global->channel_val = spi_get_hw(adc_global->spi)->dr; //Set channel value
-
     adc_global->prev_chanel = ADC_PRV_CHAN(adc_global->channel_val);
+
     uint8_t current_value = ADC_8BIT_VAL(adc_global->channel_val);
+    uint8_t mrk = adc_global->prev_chanel; // Most recent key - we are always one off because adc is adc
 
-    //printf("0x%04x Channel:%d\tValue:%d\n", adc_global->control_reg, adc_global->prev_chanel, current_value); //Print value (clean)
-    //printf("0x%04x 0x%04x\n", adc_global->control_reg, adc_global->channel_val); //Print Value (Raw)
-    
-    keyboard_global->keys[adc_global->prev_chanel].prev_pos = keyboard_global->keys[adc_global->prev_chanel].current_pos ; //Update keys struct
-    keyboard_global->keys[adc_global->prev_chanel].current_pos = current_value; //Update keys struct
 
-    if (current_value < KEY_THRESH && 
-            keyboard_global->keys[adc_global->prev_chanel].pressed == 0 &&
-            keyboard_global->keys[adc_global->prev_chanel].prev_pos > keyboard_global->keys[adc_global->prev_chanel].current_pos)
-    {
-        printf("KEY PRESSED\n");
-        keyboard_global->keys[adc_global->prev_chanel].pressed = 1;
-        
+    key *current_key = &(keyboard_global->keys[mrk]);
+    current_key->prev_pos = current_key->current_pos ; //Update keys struct
+    current_key->current_pos = current_value; //Update keys struct
+
+    // key pressed
+    if (current_value < KEY_THRESH && current_key->pressed == 0 && current_key->prev_pos > current_key->current_pos) {
+        current_key->pressed = 1;
+        current_key->start_time = get_absolute_time();
+        current_key->start_pos = current_value;
     }
     
-    if (keyboard_global->keys[adc_global->prev_chanel].pressed == 1 && current_value > KEY_THRESH){
-        printf("KEY RELEASED\n");
-        keyboard_global->keys[adc_global->prev_chanel].pressed = 0;
+    // key released
+    if (current_key->pressed == 1 && current_value > KEY_THRESH){
+        current_key->pressed = 0;
+        current_key->end_time = get_absolute_time();
+        current_key->end_pos = current_value;
     }
 
-    //keyboard_global->keys[ADC_PRV_CHAN(adc_global->channel_val)].prev_pos = keyboard_global->keys[ADC_PRV_CHAN(adc_global->channel_val)].current_pos;
 
     spi_get_hw(adc_global->spi)->icr = 0;//Reset SPI Interrupt Control Register
 }
