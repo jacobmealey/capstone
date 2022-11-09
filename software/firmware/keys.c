@@ -10,11 +10,9 @@ uint8_t key_get_velocity(key *k) {
 }
 double key_get_velocity_cms(key *k) {
     static float cm_per_step = 0.0161;
-    int delta_x = k->prev_pos - k->current_pos;
-    if(delta_x < 3){
-        return 0;
-    }
-    return (delta_x * cm_per_step)/0.005;
+    double delta_x = k->end_pos - k->start_pos;
+    double delta_t = to_ms_since_boot(k->end_time) - to_ms_since_boot(k->start_time);
+    return (delta_x * cm_per_step)/(delta_t / 1000.0);
 }
 
 struct keyboard *init_keys(){

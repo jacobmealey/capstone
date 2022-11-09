@@ -81,7 +81,6 @@ void adc_read_irq(void) {
         current_key->end_pos = current_value;
     }
 
-
     spi_get_hw(adc_global->spi)->icr = 0;//Reset SPI Interrupt Control Register
 }
 

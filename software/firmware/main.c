@@ -134,11 +134,11 @@ void core1_main() {
 
         key active_key  = keystate.keys[2];
         vel = key_get_velocity_cms(&active_key);
-        if(vel > 0 && vel < 100 && vel > top_velocity) {
-            top_velocity = vel;
-            sprintf(print_buffer, "Velocity: %.2f cm/s", top_velocity);
-            draw_string(print_buffer, 45, 125, WHITE, BLACK);
-        }
+
+        top_velocity = vel;
+        sprintf(print_buffer, "Velocity: %.2f cm/s", top_velocity);
+        draw_string(print_buffer, 45, 125, WHITE, BLACK);
+
         sprintf(print_buffer, "prev: %d curr: %d", active_key.prev_pos, active_key.current_pos);
         draw_string(print_buffer, 35, 125, WHITE, BLACK);
     }
@@ -165,6 +165,11 @@ int keyboard_task(){
         }
     } else if(keyboard_global->keys[i].active == 1 && keyboard_global->keys[i].pressed == 0){
         keyboard_global->keys[i].active = 0;
+        // push new state of the global keyboard
+        // note: we are not doing the blocking one because if the 
+        // queue is full we can just skip this as it's not "critical"
+        queue_try_add(&key_state_q, keyboard_global);
+
         if (send_general_midi_message(NOTE_OFF, keyboard_global->channel, note,0,0)){
             printf("MIDI NOTE OFF FAIL\n");
             i++;
@@ -174,11 +179,6 @@ int keyboard_task(){
             return 1;
         }
     }
-
-    // push new state of the global keyboard
-    // note: we are not doing the blocking one because if the 
-    // queue is full we can just skip this as it's not "critical"
-    queue_try_add(&key_state_q, keyboard_global);
 
     i++;
     if (i == KEY_COUNT){
