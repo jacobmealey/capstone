@@ -31,7 +31,7 @@ struct adc_t *init_adc(spi_inst_t *spi, uint16_t spi_cs) {
     adc_write_read_blocking(adc);
     printf("0x%04x 0x%04x\n", adc->control_reg, adc->channel_val);
     // set control register to continue in auto mode-2
-    adc->control_reg = ADC_MODE_AUTO2;
+    adc->control_reg = ADC_MODE_RESET | (2 << 7);
 
     // Configure timer for SPI writes
     // timer must be allocated in heap so it lives beyond lifetime of init_adc
@@ -67,18 +67,28 @@ void adc_read_irq(void) {
     current_key->prev_pos = current_key->current_pos ; //Update keys struct
     current_key->current_pos = current_value; //Update keys struct
 
+    if(current_key->current_pos < KEY_THRESH) {
+        gpio_put(PICO_DEFAULT_LED_PIN, 1);
+    } else {
+        gpio_put(PICO_DEFAULT_LED_PIN, 0);
+    }
+
+
     // key pressed
     if (current_value < KEY_THRESH && current_key->pressed == 0 && current_key->prev_pos > current_key->current_pos) {
         current_key->pressed = 1;
         current_key->start_time = get_absolute_time();
         current_key->start_pos = current_value;
     }
-    
-    // key released
-    if (current_key->pressed == 1 && current_value > KEY_THRESH){
-        current_key->pressed = 0;
+
+    if(current_key->current_pos < 5) {
         current_key->end_time = get_absolute_time();
         current_key->end_pos = current_value;
+    }
+    
+    // key released
+    if (current_key->pressed == 1 && current_key->current_pos > current_key->prev_pos){
+        current_key->pressed = 0;
     }
 
     spi_get_hw(adc_global->spi)->icr = 0;//Reset SPI Interrupt Control Register
