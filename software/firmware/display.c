@@ -33,6 +33,18 @@ int init_disp(struct disp_t *disp, spi_inst_t *spi, uint16_t disp_dc) {
     gpio_init(disp->cs);
     gpio_set_dir(disp->cs, GPIO_OUT);
 
+    gpio_init(DISPLAY_RESET);
+    gpio_set_dir(DISPLAY_RESET, GPIO_OUT);
+
+    gpio_put(DISPLAY_RESET, 1);
+    sleep_ms(50);
+    gpio_put(DISPLAY_RESET, 0);
+    sleep_ms(50);
+    gpio_put(DISPLAY_RESET, 1);
+    sleep_ms(50);
+
+
+
     uint8_t command_buffer[16];
 
     disp_wr_cmd(disp_global, DISP_SWRST, NULL, 0);

@@ -79,15 +79,16 @@ void adc_read_irq(void) {
         current_key->pressed = 1;
         current_key->start_time = get_absolute_time();
         current_key->start_pos = current_value;
+        current_key->end_pos = 0;
     }
 
-    if(current_key->current_pos < 5) {
+    if(current_key->current_pos < 5 && current_key->end_pos == 0) {
         current_key->end_time = get_absolute_time();
         current_key->end_pos = current_value;
     }
     
     // key released
-    if (current_key->pressed == 1 && current_key->current_pos > current_key->prev_pos){
+    if (current_key->pressed == 1 && current_key->current_pos > KEY_THRESH){
         current_key->pressed = 0;
     }
 

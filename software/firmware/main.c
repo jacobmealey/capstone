@@ -104,17 +104,11 @@ void core1_main() {
         screen[i] = 0xFFF;
     }
 
-    screan_to_disp(screen, buffer, screen_size);
+     screan_to_disp(screen, buffer, screen_size);
 
     disp_wr_cmd(&disp, DISP_RAMWR, buffer, DISP_SIZE);
     disp_wr_cmd(&disp, DISP_NOP, NULL, 0);
     
-    
-
-    draw_rect(10, 10, 30, 54, ORANGE);
-    draw_rect(100, 56, 15, 12, PURPLE);
-
-
 
     
     while(1) {
@@ -131,12 +125,14 @@ void core1_main() {
                 active = i;
             }
         }
+
         
         key active_key  = keystate.keys[2];
         vel = key_get_velocity_cms(&active_key);
         
         sprintf(print_buffer, "Voltage = %f", 2.5*(active_key.start_pos/ (255.0)));
         draw_string(print_buffer, 25, 125, WHITE, BLACK);
+
 
         top_velocity = vel;
         sprintf(print_buffer, "Velocity: %.2f cm/s", vel);
@@ -145,6 +141,8 @@ void core1_main() {
         sprintf(print_buffer, "pos: %d ", active_key.current_pos);
         draw_string(print_buffer, 55, 125, WHITE, BLACK);
 
+        sprintf(print_buffer, "                   ");
+        draw_string(print_buffer, 35, 125, WHITE, BLACK);
         sprintf(print_buffer, "delta t: %ld", to_ms_since_boot(active_key.end_time) - to_ms_since_boot(active_key.start_time));
         draw_string(print_buffer, 35, 125, WHITE, BLACK);
     }
