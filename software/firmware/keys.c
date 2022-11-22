@@ -12,8 +12,8 @@ uint8_t key_get_velocity(key *k) {
 double key_get_velocity_cms(key *k) {
     static float cm_per_step = 0.0161;
     double delta_x = adc_pos_lut[k->start_pos] - adc_pos_lut[k->end_pos];
-    double delta_t = to_ms_since_boot(k->end_time) - to_ms_since_boot(k->start_time);
-    return (delta_x)/(delta_t / 1000.0);
+    double delta_t = to_us_since_boot(k->end_time) - to_us_since_boot(k->start_time);
+    return (delta_x)/(delta_t / 1000000.0);
 }
 
 struct keyboard *init_keys(){

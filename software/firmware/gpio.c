@@ -131,8 +131,8 @@ void gpio_callback(uint gpio, uint32_t events)
 				break;
 			}
 			keyboard_global->octave--;
+			mute_midi_volume(0);
 			printf("Keyboard Octave: %d\n",keyboard_global->octave);
-
 			break;
 		case OCT_UP:
 			//Increase octave on keyboard struct
@@ -142,6 +142,7 @@ void gpio_callback(uint gpio, uint32_t events)
 			}
 			printf("Keyboard Octave: %d\n",keyboard_global->octave);
 			keyboard_global->octave++;
+			mute_midi_volume(0);
 			break;
 		case ENCODE_A:
 			volume_offset = 0;

@@ -143,7 +143,8 @@ void core1_main() {
 
         sprintf(print_buffer, "                   ");
         draw_string(print_buffer, 35, 125, WHITE, BLACK);
-        sprintf(print_buffer, "delta t: %ld", to_ms_since_boot(active_key.end_time) - to_ms_since_boot(active_key.start_time));
+        float deltaT = to_us_since_boot(active_key.end_time) - to_us_since_boot(active_key.start_time);
+        sprintf(print_buffer, "delta t (ms): %.2f", (deltaT/1000.0));
         draw_string(print_buffer, 35, 125, WHITE, BLACK);
     }
     
