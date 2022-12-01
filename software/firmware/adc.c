@@ -15,7 +15,7 @@ struct adc_t *init_adc(spi_inst_t *spi, uint16_t spi_cs) {
     struct adc_t *adc = malloc(sizeof(struct adc_t));
 
     adc->spi = spi;
-    spi_init(adc->spi, 200000);
+    spi_init(adc->spi, 300000);
     spi_set_format(adc->spi, 16, 0, 0, SPI_MSB_FIRST);
     adc->spi_cs = spi_cs;
     adc->control_reg = ADC_MODE_RESET;  
@@ -31,12 +31,12 @@ struct adc_t *init_adc(spi_inst_t *spi, uint16_t spi_cs) {
     adc_write_read_blocking(adc);
     printf("0x%04x 0x%04x\n", adc->control_reg, adc->channel_val);
     // set control register to continue in auto mode-2
-    adc->control_reg = ADC_MODE_RESET | (2 << 7);
+    adc->control_reg = ADC_MODE_AUTO2;
 
     // Configure timer for SPI writes
     // timer must be allocated in heap so it lives beyond lifetime of init_adc
     repeating_timer_t *timer = malloc(sizeof(repeating_timer_t));
-    if(add_repeating_timer_ms(5, adc_write_callback, NULL, timer)) {
+    if(add_repeating_timer_ms(1, adc_write_callback, NULL, timer)) {
         gpio_put(LED_0, 1);
     }
 

@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/../**",
-                "/home/landyn/Desktop/Capstone/pico/pico-sdk/**"
+                "/home/landyn/Desktop/Capstone/pico/pico-sdk/**",
+                "/home/landyn/Desktop/Capstone/capstone/software/firmware/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/arm-none-eabi-gcc",
