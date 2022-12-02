@@ -11,6 +11,7 @@
 #include "tusb.h"
 
 #include "adc.h"
+#include "adc_pos.h"
 #include "pins.h"
 #include "midi.h"
 #include "keys.h"
@@ -118,16 +119,10 @@ void core1_main() {
         }
         int active = -1;
         double vel;
-        // NOTE: THIS DOESN'T GET THE MOST RECENTLY PRESSED BUT THE 
-        // FIRST PRESSED KEY IN THE ARRAY! FIX
-        for(unsigned int i = 0; i < KEY_COUNT && active == -1; i++) {
-            if(keystate.keys[i].active) {
-                active = i;
-            }
-        }
+        
 
         
-        key active_key  = keystate.keys[2];
+        key active_key  = keystate.keys[keystate.last_pressed];
         vel = key_get_velocity_cms(&active_key);
         
         sprintf(print_buffer, "Voltage = %f", 2.5*(active_key.start_pos/ (255.0)));
@@ -135,7 +130,7 @@ void core1_main() {
 
 
         top_velocity = vel;
-        sprintf(print_buffer, "Velocity: %.2f cm/s", vel);
+       sprintf(print_buffer, "Velocity: %.2f cm/s", vel);
         draw_string(print_buffer, 45, 125, WHITE, BLACK);
 
         sprintf(print_buffer, "pos: %d ", active_key.current_pos);
@@ -146,6 +141,9 @@ void core1_main() {
         float deltaT = to_us_since_boot(active_key.end_time) - to_us_since_boot(active_key.start_time);
         sprintf(print_buffer, "delta t (ms): %.2f", (deltaT/1000.0));
         draw_string(print_buffer, 35, 125, WHITE, BLACK);
+
+        sprintf(print_buffer, "Last Pressed: %d", keystate.last_pressed);
+        draw_string(print_buffer, 15, 125, WHITE, BLACK);
     }
     
 
@@ -159,7 +157,7 @@ int keyboard_task(){
 
     if (keyboard_global->keys[i].pressed == 1 && keyboard_global->keys[i].active == 0){ //Falling edge
         keyboard_global->keys[i].active = 1;
-        uint8_t velocity = (127 - (keyboard_global->keys[i].current_pos*2));
+        uint8_t velocity = ((midi_velocity_lut[keyboard_global->keys[i].current_pos]));
         if(send_general_midi_message(NOTE_ON, keyboard_global->channel, note,velocity,0)){
             printf("MIDI NOTE ON FAIL\n");
             i++;
@@ -170,6 +168,7 @@ int keyboard_task(){
         }
     } else if(keyboard_global->keys[i].active == 1 && keyboard_global->keys[i].pressed == 0){
         keyboard_global->keys[i].active = 0;
+        keyboard_global->last_pressed = i;
 
         // push new state of the global keyboard
         // note: we are not doing the blocking one because if the 

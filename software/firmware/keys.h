@@ -35,6 +35,7 @@ typedef struct keyboard
     uint8_t volume;
     uint8_t octave;
     uint8_t channel;
+    uint8_t last_pressed;
 } keyboard;
 
 extern struct keyboard *keyboard_global;
