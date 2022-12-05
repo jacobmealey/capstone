@@ -3,16 +3,7 @@
 // display.c 
 // Authors: Jacob Mealey <jacob.mealey@maine.edu>
 //          Landyn Francis <landyn.francis@maine.edu>
-// The Display uses SPI, it can operate in many different 
-// colors modes but we will be operating in 4k color 
-// because we don't need that much stuff. 
-//
-// The display we are using is a 1.8 inch TFT display, 
-// the driver chip is the ST7735R, and we are using a 
-// breakout board from Adafruit. Much of this code is based 
-// off elements described in the data shhet and the work 
-// done for the ST7735R Arduino Library written by Adafruit,
-// 
+// See display.c for description 
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -89,6 +80,9 @@
 #define DISP_COL_65K 0x05
 #define DISP_COLOR_262K 0x06
 
+// this is the struct for keeping display state
+// it has a pointer to a spi_inst_t, it also has 
+// dc and cs pins
 struct disp_t {
     spi_inst_t *spi;
     uint16_t dc;

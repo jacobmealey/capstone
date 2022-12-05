@@ -1,7 +1,17 @@
 // display.c 
 // Authors: Jacob Mealey <jacob.mealey@maine.edu>
 //          Landyn Francis <landyn.francis@maine.edu>
+// The Display uses SPI, it can operate in many different 
+// colors modes but we will be operating in 4k color 
+// because we don't need that much stuff. Note that we 
+// use the built in spi provided by the pico sdk
 //
+// The display we are using is a 1.8 inch TFT display, 
+// the driver chip is the ST7735R, and we are using a 
+// breakout board from Adafruit. Much of this code is based 
+// off elements described in the data shhet and the work 
+// done for the ST7735R Arduino Library written by Adafruit,
+/ 
 
 #include "display.h"
 #include "pins.h"
@@ -10,23 +20,27 @@
 #include <string.h>
 
 
-// disp - a higher variable passed in from the calling funciton. This is different
-//        from how we did the ADC because this *shouldn't* need any heap allocation
-//
+// disp - a variable passed in from the calling funciton. This is different 
+// from how we did the ADC because this *shouldn't* need any heap allocation
+// spi - a pointer to the spi_inst_t that the display is connected to
+// disp_dc - this the the dc line going to the spi bus 
 int init_disp(struct disp_t *disp, spi_inst_t *spi, uint16_t disp_dc) {
     if(disp == NULL || spi == NULL) {
         printf("Error bad values passes to init_disp\n");
         return 1;
     }
+
+    // initialize struct values
     disp->spi = spi;
     disp->dc = disp_dc;
     disp->cs = SPI0_CS;
     disp_global = disp; 
 
+    // intialize spi bus :) 
     spi_init(disp->spi, 1000 * 10000);
     spi_set_format(disp->spi, 8, 0, 0, SPI_MSB_FIRST);
- 
     
+    // initialize GPIO lines
     gpio_init(disp->dc);
     gpio_set_dir(disp->dc, GPIO_OUT);
     
@@ -36,6 +50,7 @@ int init_disp(struct disp_t *disp, spi_inst_t *spi, uint16_t disp_dc) {
     gpio_init(DISPLAY_RESET);
     gpio_set_dir(DISPLAY_RESET, GPIO_OUT);
 
+    // hardware reset the display
     gpio_put(DISPLAY_RESET, 1);
     sleep_ms(50);
     gpio_put(DISPLAY_RESET, 0);
@@ -43,10 +58,12 @@ int init_disp(struct disp_t *disp, spi_inst_t *spi, uint16_t disp_dc) {
     gpio_put(DISPLAY_RESET, 1);
     sleep_ms(50);
 
-
-
+    // command buffer is a scratch pad for sending commands
+    // to the display
     uint8_t command_buffer[16];
 
+    // This command sequence is both from the display datasheet
+    // and the adafruit library. 
     disp_wr_cmd(disp_global, DISP_SWRST, NULL, 0);
     sleep_ms(50);
     disp_wr_cmd(disp_global, DISP_SLPOUT, NULL, 0);
@@ -110,6 +127,9 @@ int init_disp(struct disp_t *disp, spi_inst_t *spi, uint16_t disp_dc) {
 
 
 
+// disp_wr_cmd is a blocking function for sending commands to the display. it requires 
+// a pointer to the displayt struct, an individual command, an array of 8 bit integers 
+// which are the arguments for the given command and the amount of arguments.
 int disp_wr_cmd(struct disp_t *disp, uint8_t command, uint8_t *args, unsigned int len) {
     gpio_put(disp->cs, 0);
     gpio_put(disp->dc, 0);
@@ -160,6 +180,7 @@ int screan_to_disp(uint16_t *screen, uint8_t *disp, int screen_len) {
     return bi;
 }
 
+// set the x position for the display ram
 void set_x(uint8_t x) {
     if(x > DISPLAY_W) x = DISPLAY_W;
     uint8_t command_buffer[4];
@@ -170,6 +191,7 @@ void set_x(uint8_t x) {
     disp_wr_cmd(disp_global, DISP_CASET, command_buffer, 4);
 }
 
+// set the y position for the display ram
 void set_y(uint8_t y) {
     if(y > DISPLAY_HEIGHT) y = DISPLAY_HEIGHT;
     uint8_t command_buffer[4];
@@ -214,7 +236,6 @@ int draw_rect(uint8_t x, uint8_t y, uint8_t h, uint8_t w, uint16_t color){
 
 }
 
-
 // Draw a string of characters to the display and location x,y 
 // str - a null terminatd string of characters. 
 void draw_string(const char *str, uint8_t x, uint8_t y, uint16_t font_bg, uint16_t font_fg){
@@ -227,7 +248,6 @@ void draw_string(const char *str, uint8_t x, uint8_t y, uint16_t font_bg, uint16
         str++;
     }
 }
-
 
 // Draw a single character to the display
 // c - character to draw

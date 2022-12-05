@@ -1,3 +1,7 @@
+// Filename: adc.h
+// Authors: Jacob Mealey <jacob.mealey@maine.edu>
+//          Landyn Francis <landyn.francis@maine.edu>
+// Interface for ADS7960, see adc.c for more details
 #ifndef SPI_ADC_H
 #define SPI_ADC_H
 
@@ -36,14 +40,23 @@
 #define ADC_PROG_ENALL 0x0FFF
 
 
+// adc_t is the structure for storing information about the current
+// adc. it has 5 member variables two are for spi, and the other 
+// three are for channel values and data.
 struct adc_t {
-    spi_inst_t *spi;
-    uint16_t control_reg;
-    uint16_t prev_chanel;
-    uint16_t channel_val;
-    uint16_t spi_cs;
+    spi_inst_t *spi;        // A pointer to an spi_inst_t that the adc is 
+                            // connected to. 
+    uint16_t control_reg;   // This is the value that will be written to the
+                            // ADC.
+    uint16_t prev_chanel;   // This is the index of the most recently read 
+                            // channel from the ADC, for this project it 
+                            // ranges from 0 - 11
+    uint16_t channel_val;   // The is the ADC value of prev_channel
+    uint16_t spi_cs;        // The chip select line
+
 };
 
+// This is a global adc that can be seen by the entire project
 extern struct adc_t *adc_global;
 
 // init adc takes the spi and the CS lines, it allocates 
