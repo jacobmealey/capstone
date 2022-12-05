@@ -11,11 +11,11 @@
 #include "tusb.h"
 
 #include "adc.h"
-#include "adc_pos.h"
 #include "pins.h"
 #include "midi.h"
 #include "keys.h"
 #include "display.h"
+#include "midi_velocity_lut.h"
 
 #include "hardware/spi.h"
 #include "hardware/gpio.h"
@@ -36,7 +36,6 @@ struct disp_t *disp_global;
 // A queue for sending the current state of the keyboard
 // to the second core 
 queue_t key_state_q;
-
 
 /*------------- MAIN -------------*/
 int main(void) {
@@ -157,7 +156,7 @@ int keyboard_task(){
 
     if (keyboard_global->keys[i].pressed == 1 && keyboard_global->keys[i].active == 0){ //Falling edge
         keyboard_global->keys[i].active = 1;
-        uint8_t velocity = ((midi_velocity_lut[keyboard_global->keys[i].current_pos]));
+        uint8_t velocity = 127 - ((keyboard_global->keys[i].current_pos)*2);
         if(send_general_midi_message(NOTE_ON, keyboard_global->channel, note,velocity,0)){
             printf("MIDI NOTE ON FAIL\n");
             i++;
