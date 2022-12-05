@@ -1,3 +1,7 @@
+// Filename: adc_pos.h
+// Authors: Jacob Mealey <jacob.mealey@maine.edu> 
+//          Landyn Francis <landyn.francis@maine.edu>
+// This file provides a look table to convert adc values to voltages
 #ifndef ADC_POS_H
 #define ADC_POS_H
 
