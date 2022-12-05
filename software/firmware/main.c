@@ -94,7 +94,8 @@ int main(void) {
 
     return 0;
 }
-
+// Code to run on Second Core
+// The second core runs the display, and handles any heavy compuations, such as velocity.
 void core1_main() {
     struct disp_t disp;
     printf("initializing display");
@@ -165,7 +166,10 @@ void core1_main() {
 
 }
 
-
+// Query each key and determine if they are pressed
+// If a key is pressed do the following:
+//      1. Send a MIDI message with the appropraite note and MIDI velocity
+//      2. Gather press data, and transfer to second core to display.
 int keyboard_task(){
     static int i = 0;
 
@@ -227,7 +231,8 @@ int keyboard_task(){
 // MIDI Task
 //--------------------------------------------------------------------+
 
-
+// MIDI Task to read incoming MIDI messages from host device. Must do this
+// to be able to write messages. 
 void midi_task(struct adc_t *adc) {
     static uint32_t start_ms = 0;
 
@@ -242,7 +247,7 @@ void midi_task(struct adc_t *adc) {
     while ( tud_midi_available() ) tud_midi_packet_read(packet);
 
     // Wait appropriate time between sending MIDI packages
-    if (board_millis() - start_ms < 286) return; // not enough time
+    if (board_millis() - start_ms < 286) return;
     start_ms += 286;
 }
 
