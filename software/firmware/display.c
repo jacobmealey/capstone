@@ -11,7 +11,6 @@
 // breakout board from Adafruit. Much of this code is based 
 // off elements described in the data shhet and the work 
 // done for the ST7735R Arduino Library written by Adafruit,
-/ 
 
 #include "display.h"
 #include "pins.h"
@@ -147,7 +146,7 @@ int disp_wr_cmd(struct disp_t *disp, uint8_t command, uint8_t *args, unsigned in
 // screen is the "easy" to interract with form of display data, each element
 // in screen corresponds to 1 pixel, formattted like: 0x0RGB.
 // disp is the formmatted version of screen to be written to the SPI bus
-int screan_to_disp(uint16_t *screen, uint8_t *disp, int screen_len) {
+int screen_to_disp(uint16_t *screen, uint8_t *disp, int screen_len) {
     uint8_t acc = 0; // accumulator for screen translation
     int acc_set = 0; // variable to check accumlator
     int i = 0; // the current pixel in the screen array
@@ -216,7 +215,7 @@ int draw_rect(uint8_t x, uint8_t y, uint8_t h, uint8_t w, uint16_t color){
    }
 
    // convert screen to w
-   screan_to_disp(screen, buffer, w);
+   screen_to_disp(screen, buffer, w);
    // go the the x position
    set_x(x);
   
@@ -271,7 +270,7 @@ void draw_char(char c, uint8_t x, uint8_t y, uint16_t font_bg, uint16_t font_fg)
         }
         set_y(y - i); // move to to next line
         // write current line to the display
-        screan_to_disp(screen, buffer, 7); 
+        screen_to_disp(screen, buffer, 7); 
         disp_wr_cmd(disp_global, DISP_RAMWR, buffer, 11);
     }
 
@@ -300,7 +299,7 @@ void draw_font_test() {
             screen[j] = ((character[i] >> j) & 1u) ? 0x000: 0xFFF;
         }
         set_y(y - i);
-        screan_to_disp(screen, buffer, 7);
+        screen_to_disp(screen, buffer, 7);
         disp_wr_cmd(disp_global, DISP_RAMWR, buffer, 11);
     }
 
