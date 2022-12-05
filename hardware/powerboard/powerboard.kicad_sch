@@ -2843,7 +2843,7 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 1698d5aa-82b5-40da-83b3-ad3197e115b6)
   )
-  (text "W25Q128JVSIM Flash Memory\n256MB\nPull QSPI_SS low during rest to enter flash mode."
+  (text "W25Q128JVSIM Flash Memory\n128Mbit\nPull QSPI_SS low during rest to enter flash mode."
     (at 13.97 123.19 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 1f9c280f-4e12-421c-bc82-01367a89f0d9)
