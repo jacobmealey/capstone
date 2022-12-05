@@ -54,10 +54,13 @@
 #define ENCODE_B        27
 #define ENCODE_A        28
 
+// GPIO Interrupt Callback Function
 void gpio_callback(uint gpio, uint32_t events);
 
+// Initialize GPIO Pins
 uint8_t pin_init();
 
+// GPIO Event to String
 void gpio_event_string(char *buf, uint32_t events);
 
 

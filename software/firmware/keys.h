@@ -9,44 +9,60 @@
 // amount of keys in the keyboard
 #define KEY_COUNT 12U
 
-// The amount of difference between key.current_pos
-// and key.prev_pos to be considered "pressed" this
-// will most likely need to be tuned later.
+// The point at which a key is "pressed"
 #define KEY_THRESH 63
+
+// Largest ADC Value
 #define KEY_UPPER 95U
+
+// Lowest ADC Value
 #define KEY_LOWER 3U
 
+// Individual Key Structure: A structure that holds relevant (individual) key data
+// current_pos: key position from current read
+// prev_pos: key position from previous read
+// pressed: Falling/Rising edge flag
+// active: Held down key flag
+// start_time: Timestamp of beginning of keypress
+// end_time: Timestamp of end of keypress
+// start_pos: Position of beggining of keypress
+// end_pos: Position of end of keypress
 typedef struct key
 {
-    uint8_t current_pos; // current position of the key
-    uint8_t prev_pos;    // previous position of the key
-    uint8_t pressed;     // Flag showing whether or not the key has been pressed.
-    uint8_t active;      // Flag showing whether or not the key is active.
-    absolute_time_t start_time;
-    absolute_time_t end_time;
-    uint8_t start_pos;
-    uint8_t end_pos;    
+    uint8_t current_pos;        // Current position of the key (ADC Value)
+    uint8_t prev_pos;           // Previous position of the key (ADC Value)
+    uint8_t pressed;            // Flag showing whether or not the key has been pressed. 
+    uint8_t active;             // Flag showing whether or not the key is active. (Being held down)
+    absolute_time_t start_time; // The time when a key press begins
+    absolute_time_t end_time;   // The time when a key press ends
+    uint8_t start_pos;          // The position from the start of a keypress (ADC Value)
+    uint8_t end_pos;            // The position from the end of a keypress (ADC Value)
 
 } key;
 
+
+// Keyboard Structure: A structure that holds relevant keyboard data
+// keys[]: Array of key structs for each individual key
+// volume: 8 bit MIDI volume value
+// channel: MIDI Channel (stays as 0)
+// last_pressed: last pressed key number (0-11)
 typedef struct keyboard
 {
     key keys[KEY_COUNT];
-    uint8_t volume;
-    uint8_t octave;
-    uint8_t channel;
-    uint8_t last_pressed;
+    uint8_t volume;         // MIDI Volume (0-127)
+    uint8_t octave;         // Keyboard Octave (Range of 2-8 Allowed)
+    uint8_t channel;        // MIDI Channel (stays as 0)
+    uint8_t last_pressed;   // Last pressed key number (0-11)
 } keyboard;
 
+// Declare global keyboard structure
 extern struct keyboard *keyboard_global;
 
 // Initialization function
 struct keyboard *init_keys();
 
-// individual key functions
+// Individual key functions
 
-// takes a type k and returns the midi acceptable velocity of it.
-uint8_t key_get_velocity(key *k);
 
 // takes a type k and returns the decimal calculation velocity in cm/s
 double key_get_velocity_cms(key *k);

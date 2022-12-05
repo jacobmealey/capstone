@@ -106,7 +106,7 @@ extern struct disp_t *disp_global;
 int init_disp(struct disp_t *disp, spi_inst_t *spi, uint16_t disp_dc);
 int disp_wr_cmd(struct disp_t *disp, uint8_t command, uint8_t *args, unsigned int len);
 
-int screan_to_disp(uint16_t *screen, uint8_t *disp, int screen_len);
+int screen_to_disp(uint16_t *screen, uint8_t *disp, int screen_len);
 
 void set_x(uint8_t x);
 void set_y(uint8_t y);

@@ -24,13 +24,18 @@
 #include "pico/util/queue.h"
 
 #define DISP_SIZE 30720
-int keyboard_task();
 
+int keyboard_task();
 void midi_task(struct adc_t *adc);
 void core1_main();
 
+// Global ADC Structure
 struct adc_t *adc_global;
+
+// Global Keyboard Structure
 struct keyboard *keyboard_global;
+
+// Global Display Structure
 struct disp_t *disp_global;
 
 // A queue for sending the current state of the keyboard
@@ -40,26 +45,27 @@ queue_t key_state_q;
 /*------------- MAIN -------------*/
 int main(void) {
  
+    // Initialize UART with 9600 baud rate
     stdio_init_all();
     uart_init(uart0, 9600);
     
-    //Initialize GPIO pins
+    // Initialize GPIO pins
     pin_init();
 
-    //Initialize ADC
+    // Initialize ADC on SPI_1
     gpio_put(LED_0,1);
     adc_global = init_adc(spi1, SPI1_CS);
     gpio_put(LED_0,0);
     printf("ADC initialized\n");
 
 
-    //Initialize Keyboard
+    // Initialize Keyboard on SPI_0
     gpio_put(LED_1,1);
     keyboard_global = init_keys();
     gpio_put(LED_1,0);
     printf("Keyboard Initialized"); 
 
-    //Initialize USB
+    // Initialize USB using TinyUSB
     gpio_put(LED_2,1);
     tusb_init();
     gpio_put(LED_2,0);
@@ -68,14 +74,20 @@ int main(void) {
     // Initialize Queue for inter core comms
     queue_init(&key_state_q, sizeof(struct keyboard), 2);
 
+    // Launch display code on second core
     gpio_put(LED_3,1);
     multicore_launch_core1(core1_main);
     gpio_put(LED_3,0);
 
 
     while (1) {
-        tud_task(); // tinyusb device task
+        // TinyUSB Device task (setup USB configuration)
+        tud_task();
+
+        // MIDI Task for preparing MIDI transactions
         midi_task(adc_global);
+
+        // Read keyboard
         keyboard_task();
     }
 
@@ -88,10 +100,9 @@ void core1_main() {
     printf("initializing display");
     init_disp(&disp, spi0, TFT_DC);
     printf("Entering main loop\n");
+
     // Buffer that will be written to the screen
     char print_buffer[128];
-
-    double top_velocity = 0;
 
     uint8_t buffer[DISP_SIZE];
     int screen_size = 128*160;
@@ -104,8 +115,7 @@ void core1_main() {
         screen[i] = 0xFFF;
     }
 
-     screan_to_disp(screen, buffer, screen_size);
-
+    screen_to_disp(screen, buffer, screen_size);
     disp_wr_cmd(&disp, DISP_RAMWR, buffer, DISP_SIZE);
     disp_wr_cmd(&disp, DISP_NOP, NULL, 0);
     
@@ -116,31 +126,38 @@ void core1_main() {
         if(!queue_try_remove(&key_state_q, &keystate)) {
             continue; // we couldn't remove so we do nothing else
         }
-        int active = -1;
         double vel;
         
 
-        
+        // Get most recently pressed key
         key active_key  = keystate.keys[keystate.last_pressed];
+        // Determine velocity
         vel = key_get_velocity_cms(&active_key);
         
+        // Print first voltage level read on downward press
         sprintf(print_buffer, "Voltage = %f", 2.5*(active_key.start_pos/ (255.0)));
         draw_string(print_buffer, 25, 125, WHITE, BLACK);
 
-
-        top_velocity = vel;
-       sprintf(print_buffer, "Velocity: %.2f cm/s", vel);
+        // Print calculated velocity
+        sprintf(print_buffer, "Velocity: %.2f cm/s", vel);
         draw_string(print_buffer, 45, 125, WHITE, BLACK);
 
+        // Print ADC value of current key
         sprintf(print_buffer, "pos: %d ", active_key.current_pos);
         draw_string(print_buffer, 55, 125, WHITE, BLACK);
 
+        // Clear out old data from screen
         sprintf(print_buffer, "                   ");
         draw_string(print_buffer, 35, 125, WHITE, BLACK);
+
+        // Determine time difference between start of keypress and end of keypress
         float deltaT = to_us_since_boot(active_key.end_time) - to_us_since_boot(active_key.start_time);
+
+        // Print delta T
         sprintf(print_buffer, "delta t (ms): %.2f", (deltaT/1000.0));
         draw_string(print_buffer, 35, 125, WHITE, BLACK);
 
+        // Print which key number was pressed
         sprintf(print_buffer, "Last Pressed: %d", keystate.last_pressed);
         draw_string(print_buffer, 15, 125, WHITE, BLACK);
     }
@@ -152,21 +169,33 @@ void core1_main() {
 int keyboard_task(){
     static int i = 0;
 
+    // Calculate note based on current octave and key pressed
     uint8_t note = i + (keyboard_global->octave * 12);
 
-    if (keyboard_global->keys[i].pressed == 1 && keyboard_global->keys[i].active == 0){ //Falling edge
+    // If the key has been pressed, and was previously not pressed (falling edge)
+    if (keyboard_global->keys[i].pressed == 1 && keyboard_global->keys[i].active == 0){ 
+        // Key is now active
         keyboard_global->keys[i].active = 1;
+
+        // Poor Man's MIDI Velocity (this can be improved)
         uint8_t velocity = 127 - ((keyboard_global->keys[i].current_pos)*2);
+
+        // Send NOTE ON MIDI Message
         if(send_general_midi_message(NOTE_ON, keyboard_global->channel, note,velocity,0)){
             printf("MIDI NOTE ON FAIL\n");
+            // Continue to iterate through keys
             i++;
             if (i == KEY_COUNT){
                 i = 0;
             }
             return 1;
         }
+    // If Key is active, but no longer pressed (Rising edge)
     } else if(keyboard_global->keys[i].active == 1 && keyboard_global->keys[i].pressed == 0){
+        // Key is no longer active
         keyboard_global->keys[i].active = 0;
+
+        // Update most recently pressed key
         keyboard_global->last_pressed = i;
 
         // push new state of the global keyboard
@@ -174,8 +203,10 @@ int keyboard_task(){
         // queue is full we can just skip this as it's not "critical"
         queue_try_add(&key_state_q, keyboard_global);
 
+        // Send NOTE OFF MIDI Message
         if (send_general_midi_message(NOTE_OFF, keyboard_global->channel, note,0,0)){
             printf("MIDI NOTE OFF FAIL\n");
+            // Continue to iterate through keys
             i++;
             if (i == KEY_COUNT){
                 i = 0;
@@ -184,6 +215,7 @@ int keyboard_task(){
         }
     }
     
+    // Continue to iterate through keys
     i++;
     if (i == KEY_COUNT){
         i = 0;
@@ -200,7 +232,6 @@ void midi_task(struct adc_t *adc) {
     static uint32_t start_ms = 0;
 
     //uint8_t const cable_num = 0; // MIDI jack associated with USB endpoint
-    // GET most recently read key 
     if(adc == NULL) return;
 
 
@@ -210,7 +241,7 @@ void midi_task(struct adc_t *adc) {
     uint8_t packet[4];
     while ( tud_midi_available() ) tud_midi_packet_read(packet);
 
-    // send note periodically
+    // Wait appropriate time between sending MIDI packages
     if (board_millis() - start_ms < 286) return; // not enough time
     start_ms += 286;
 }
