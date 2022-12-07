@@ -37,6 +37,7 @@ typedef struct key
     absolute_time_t end_time;   // The time when a key press ends
     uint8_t start_pos;          // The position from the start of a keypress (ADC Value)
     uint8_t end_pos;            // The position from the end of a keypress (ADC Value)
+    float activation_height;
 
 } key;
 
