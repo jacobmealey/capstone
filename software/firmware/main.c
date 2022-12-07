@@ -196,16 +196,6 @@ int keyboard_task(){
 
         keyboard_global->keys[i].midi_end = get_absolute_time();
 
-        uint16_t input_start = 1;
-        uint16_t input_end = 127;
-        uint16_t output_start = 127;
-        uint16_t output_end = 1;
-
-        double slope = 1.0 * (output_end - output_start) / (input_end - input_start);
-
-
-        
-
         int delta_t = to_ms_since_boot(keyboard_global->keys[i].midi_end) - to_ms_since_boot(keyboard_global->keys[i].midi_start);
         
         if (delta_t > 127){
