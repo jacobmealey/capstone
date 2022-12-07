@@ -121,6 +121,8 @@ void core1_main() {
     disp_wr_cmd(&disp, DISP_NOP, NULL, 0);
     
 
+    sprintf(print_buffer, "MIDI Keyboard");
+    draw_string(print_buffer, 55, 125, WHITE, BLACK);
     
     while(1) {
         keyboard keystate;

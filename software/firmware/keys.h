@@ -39,6 +39,7 @@ typedef struct key
     uint8_t end_pos;            // The position from the end of a keypress (ADC Value)
     absolute_time_t midi_start; // Timer start for MIDI Velocity
     absolute_time_t midi_end;   // Timer end for MIDI Velocity
+    float activation_height;
 
 } key;
 
