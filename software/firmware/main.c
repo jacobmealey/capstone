@@ -161,6 +161,10 @@ void core1_main() {
         // Print which key number was pressed
         sprintf(print_buffer, "Last Pressed: %d", keystate.last_pressed);
         draw_string(print_buffer, 15, 125, WHITE, BLACK);
+
+        int dT = to_us_since_boot(active_key.midi_end) - to_us_since_boot(active_key.midi_start);
+        sprintf(print_buffer, "MIDI Delta T(us): %d", dT);
+        draw_string(print_buffer,5,125,WHITE,BLACK );
     }
     
 
@@ -176,12 +180,19 @@ int keyboard_task(){
     // Calculate note based on current octave and key pressed
     uint8_t note = i + (keyboard_global->octave * 12);
 
+    if (keyboard_global->keys[i].current_pos < 80){
+        keyboard_global->keys[i].midi_start = get_absolute_time();
+    }
+
     // If the key has been pressed, and was previously not pressed (falling edge)
     if (keyboard_global->keys[i].pressed == 1 && keyboard_global->keys[i].active == 0){ 
         // Key is now active
         keyboard_global->keys[i].active = 1;
 
+        keyboard_global->keys[i].midi_end = get_absolute_time();
         // Poor Man's MIDI Velocity (this can be improved)
+        double delta_t = to_us_since_boot(keyboard_global->keys[i].midi_end) - to_us_since_boot(keyboard_global->keys[i].midi_start);
+
         uint8_t velocity = 127 - ((keyboard_global->keys[i].current_pos)*2);
 
         // Send NOTE ON MIDI Message
