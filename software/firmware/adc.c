@@ -98,7 +98,6 @@ void adc_read_irq(void) {
         gpio_put(PICO_DEFAULT_LED_PIN, 0);
     }
 
-
     // Determines if a key is pressed
     if (current_value < KEY_THRESH && current_key->pressed == 0 && current_key->prev_pos > current_key->current_pos) {
         current_key->pressed = 1;

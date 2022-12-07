@@ -164,9 +164,6 @@ void core1_main() {
         sprintf(print_buffer, "Last Pressed: %d", keystate.last_pressed);
         draw_string(print_buffer, 15, 125, WHITE, BLACK);
 
-        int dT = to_us_since_boot(active_key.midi_end) - to_us_since_boot(active_key.midi_start);
-        sprintf(print_buffer, "MIDI Delta T(us): %d", dT);
-        draw_string(print_buffer,5,125,WHITE,BLACK );
     }
     
 
@@ -182,8 +179,14 @@ int keyboard_task(){
     // Calculate note based on current octave and key pressed
     uint8_t note = i + (keyboard_global->octave * 12);
 
-    if (keyboard_global->keys[i].current_pos < 80){
+    if (keyboard_global->keys[i].current_pos < 75 && keyboard_global->keys[i].midi_active == 0){
+        keyboard_global->keys[i].midi_active = 1;
         keyboard_global->keys[i].midi_start = get_absolute_time();
+        printf("First threshold!\n");
+    }
+
+    if (keyboard_global->keys[i].current_pos > 80 && keyboard_global->keys[i].midi_active == 1){
+        keyboard_global->keys[i].midi_active = 0;
     }
 
     // If the key has been pressed, and was previously not pressed (falling edge)
@@ -192,10 +195,30 @@ int keyboard_task(){
         keyboard_global->keys[i].active = 1;
 
         keyboard_global->keys[i].midi_end = get_absolute_time();
-        // Poor Man's MIDI Velocity (this can be improved)
-        double delta_t = to_us_since_boot(keyboard_global->keys[i].midi_end) - to_us_since_boot(keyboard_global->keys[i].midi_start);
 
-        uint8_t velocity = 127 - ((keyboard_global->keys[i].current_pos)*2);
+        uint16_t input_start = 1;
+        uint16_t input_end = 127;
+        uint16_t output_start = 127;
+        uint16_t output_end = 1;
+
+        double slope = 1.0 * (output_end - output_start) / (input_end - input_start);
+
+
+        
+
+        int delta_t = to_ms_since_boot(keyboard_global->keys[i].midi_end) - to_ms_since_boot(keyboard_global->keys[i].midi_start);
+        
+        if (delta_t > 127){
+            delta_t = 127;
+        }
+        if (delta_t < 1){
+            delta_t = 1;
+        }
+        
+        
+        uint8_t velocity = 127 - delta_t;
+        //uint8_t velocity = output_start + slope * ((delta_t) - input_start);
+        printf("MIDI Delta T (%d): %d, velocty = %d\n",i,delta_t, velocity);
 
         // Send NOTE ON MIDI Message
         if(send_general_midi_message(NOTE_ON, keyboard_global->channel, note,velocity,0)){
