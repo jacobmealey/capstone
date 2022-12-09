@@ -1,5 +1,6 @@
 // keys.h
 // Authors: Jacob Mealey & Landyn Francis
+// Purpose: See keys.c
 #ifndef KEYS_H
 #define KEYS_H
 
@@ -31,7 +32,7 @@ typedef struct key
 {
     uint8_t current_pos;        // Current position of the key (ADC Value)
     uint8_t prev_pos;           // Previous position of the key (ADC Value)
-    uint8_t pressed;            // Flag showing whether or not the key has been pressed. 
+    uint8_t pressed;            // Flag showing whether or not the key has been pressed.
     uint8_t active;             // Flag showing whether or not the key is active. (Being held down)
     absolute_time_t start_time; // The time when a key press begins
     absolute_time_t end_time;   // The time when a key press ends
@@ -44,7 +45,6 @@ typedef struct key
 
 } key;
 
-
 // Keyboard Structure: A structure that holds relevant keyboard data
 // keys[]: Array of key structs for each individual key
 // volume: 8 bit MIDI volume value
@@ -53,10 +53,10 @@ typedef struct key
 typedef struct keyboard
 {
     key keys[KEY_COUNT];
-    uint8_t volume;         // MIDI Volume (0-127)
-    uint8_t octave;         // Keyboard Octave (Range of 2-8 Allowed)
-    uint8_t channel;        // MIDI Channel (stays as 0)
-    uint8_t last_pressed;   // Last pressed key number (0-11)
+    uint8_t volume;       // MIDI Volume (0-127)
+    uint8_t octave;       // Keyboard Octave (Range of 2-8 Allowed)
+    uint8_t channel;      // MIDI Channel (stays as 0)
+    uint8_t last_pressed; // Last pressed key number (0-11)
 } keyboard;
 
 // Declare global keyboard structure
@@ -67,9 +67,7 @@ struct keyboard *init_keys();
 
 // Individual key functions
 
-
 // takes a type k and returns the decimal calculation velocity in cm/s
 double key_get_velocity_cms(key *k);
-
 
 #endif

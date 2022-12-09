@@ -99,4 +99,4 @@ uint8_t midi_velocity_lut[95] = {
 	125,
 };
 
-#endif 
+#endif

@@ -140,7 +140,7 @@ void gpio_callback(uint gpio, uint32_t events)
 	case OCT_DOWN:
 		// Don't allow users to go below octave 2
 		if (keyboard_global->octave <= 2)
-		{ 
+		{
 			break;
 		}
 		// Decrement octave
@@ -151,7 +151,7 @@ void gpio_callback(uint gpio, uint32_t events)
 	case OCT_UP:
 		// Don't allow users to go above octave 8
 		if (keyboard_global->octave >= 8)
-		{ 
+		{
 			break;
 		}
 		// Increment octave
@@ -160,7 +160,7 @@ void gpio_callback(uint gpio, uint32_t events)
 		mute_midi_volume(0);
 		break;
 	case ENCODE_A:
-		// Amount to adjust volume 
+		// Amount to adjust volume
 		volume_offset = 0;
 		// Check other Rotary Encoder line
 		if (gpio_get(ENCODE_B) == 0)
@@ -170,7 +170,7 @@ void gpio_callback(uint gpio, uint32_t events)
 			// Don't allow negative volume
 			if (volume_offset > keyboard_global->volume)
 			{
-				keyboard_global->volume = 0; 
+				keyboard_global->volume = 0;
 			}
 			else
 			{
@@ -180,13 +180,13 @@ void gpio_callback(uint gpio, uint32_t events)
 		}
 		// Otherwise, Counter-clockwise
 		else
-		{ 
+		{
 			// Increment offset
 			volume_offset++;
 			// Don't allow volumes over 127
 			if (keyboard_global->volume + volume_offset > 127)
 			{
-				keyboard_global->volume = 127; 
+				keyboard_global->volume = 127;
 			}
 			else
 			{
