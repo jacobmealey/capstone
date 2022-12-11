@@ -1,9 +1,9 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
-// display.c 
+// display.c
 // Authors: Jacob Mealey <jacob.mealey@maine.edu>
 //          Landyn Francis <landyn.francis@maine.edu>
-// See display.c for description 
+// See display.c for description
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -16,7 +16,6 @@
 
 #define DISPLAY_W 128
 #define DISPLAY_HEIGHT 160
-
 
 // List of commands from pg. 77 of ST7735 Datasheet
 #define DISP_NOP 0x00
@@ -81,15 +80,17 @@
 #define DISP_COLOR_262K 0x06
 
 // this is the struct for keeping display state
-// it has a pointer to a spi_inst_t, it also has 
+// it has a pointer to a spi_inst_t, it also has
 // dc and cs pins
-struct disp_t {
+struct disp_t
+{
     spi_inst_t *spi;
     uint16_t dc;
     uint16_t cs;
 };
 
-enum display_colors {
+enum display_colors
+{
     RED = 0xF00,
     GREEN = 0x0F0,
     BLUE = 0x00F,
@@ -117,7 +118,3 @@ void draw_font_test();
 void draw_char(char c, uint8_t x, uint8_t y, uint16_t font_bg, uint16_t font_fg);
 void draw_string(const char *c, uint8_t x, uint8_t y, uint16_t font_bg, uint16_t font_fg);
 #endif
-
-
-
-

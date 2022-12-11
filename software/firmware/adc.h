@@ -40,6 +40,7 @@
 #define ADC_PROG_ENALL 0x0FFF
 
 
+
 // adc_t is the structure for storing information about the current
 // adc. it has 5 member variables two are for spi, and the other 
 // three are for channel values and data.

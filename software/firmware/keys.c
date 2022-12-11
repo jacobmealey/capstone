@@ -1,3 +1,7 @@
+// File: gpio.c
+// Date Created: 9/18/22
+// Authors: Landyn Francis (landyn.francis@maine.edu) Jacob Mealey (jacob.mealey@maine.edu)
+// Purpose: Source file containing keyboard specific functions, suh as getting velocity in cm/s and initializing the whole keyboard.
 #include "keys.h"
 #include "stdlib.h"
 #include "pico/stdlib.h"
